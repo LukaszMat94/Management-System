@@ -9,12 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class FrontController {
 
-    LaptopService laptopService;
-
     @Autowired
-    public FrontController(LaptopService laptopService){
-        this.laptopService = laptopService;
-    }
+    LaptopService laptopService;
 
     @GetMapping(value = "/welcome", produces = "application/json")
     public Laptop welcomePage(){

@@ -16,26 +16,27 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 import java.util.Properties;
 
-@Configuration
+
 @EnableTransactionManagement
-@EnableJpaRepositories
-@ComponentScan({"org.matusikl.model", "org.matusikl.service"})
+@EnableJpaRepositories(basePackages = "org.matusikl.repository")
+@ComponentScan(basePackages = "org.matusikl.service")
+@Configuration
 public class CustomDataJPAConfig {
 
     @Bean
-    public LocalContainerEntityManagerFactoryBean getEntityManager() {
-        LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
-        entityManagerFactoryBean.setDataSource(getDataSource());
-        entityManagerFactoryBean.setPackagesToScan();
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+        LocalContainerEntityManagerFactoryBean entityManagerFactory = new LocalContainerEntityManagerFactoryBean();
+        entityManagerFactory.setDataSource(dataSource());
+        entityManagerFactory.setPackagesToScan("org.matusikl.model");
 
         JpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
-        entityManagerFactoryBean.setJpaVendorAdapter(jpaVendorAdapter);
-        entityManagerFactoryBean.setJpaProperties(getProperties());
-        return entityManagerFactoryBean;
+        entityManagerFactory.setJpaVendorAdapter(jpaVendorAdapter);
+        entityManagerFactory.setJpaProperties(getProperties());
+        return entityManagerFactory;
     }
 
     @Bean
-    public DataSource getDataSource(){
+    public DataSource dataSource(){
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
         dataSource.setUrl("jdbc:sqlserver://LucasPC\\SQLEXPRESS;databaseName=Management System");
@@ -48,7 +49,6 @@ public class CustomDataJPAConfig {
         Properties properties = new Properties();
         properties.setProperty("hibernate.hbm2ddl.auto", "update");
         properties.setProperty("hibernate.dialect" ,"org.hibernate.dialect.SQLServer2012Dialect");
-        properties.setProperty("hibernate.show_sql", "true");
         return properties;
     }
 
@@ -58,9 +58,9 @@ public class CustomDataJPAConfig {
     }
 
     @Bean
-    public PlatformTransactionManager getTransactionManager(){
+    public PlatformTransactionManager transactionManager(){
         JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(getEntityManager().getObject());
+        transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
         return transactionManager;
     }
 }
