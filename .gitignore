@@ -23,3 +23,6 @@
 hs_err_pid*
 *.idea
 *.iml
+
+# own files, not connected strong with project
+ZmianyDoProjektu.txt
