@@ -1,12 +1,13 @@
 package org.matusikl.initConfig;
 
+import org.matusikl.config.CustomDataJPAConfig;
 import org.matusikl.config.CustomWebMvcConfig;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 public class WebInitConfig extends AbstractAnnotationConfigDispatcherServletInitializer {
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return new Class[0];
+        return new Class[] {CustomDataJPAConfig.class};
     }
 
     @Override
