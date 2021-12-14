@@ -7,12 +7,12 @@ import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatche
 public class WebInitConfig extends AbstractAnnotationConfigDispatcherServletInitializer {
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return new Class[] {CustomDataJPAConfig.class};
+        return new Class<?>[] { CustomDataJPAConfig.class };
     }
 
     @Override
     protected Class<?>[] getServletConfigClasses() {
-        return new Class[] {CustomWebMvcConfig.class};
+        return new Class<?>[] { CustomWebMvcConfig.class };
     }
 
     @Override
