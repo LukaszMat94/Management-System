@@ -14,7 +14,8 @@ public class FrontController {
 
     @GetMapping(value = "/welcome", produces = "application/json")
     public Laptop welcomePage(){
-
+        //Zwracaj ResponseEntity z typem Laptop, a nie obiekt javowy
+        // Laptop powinien bys Serializable
         return laptopService.getLaptop();
     }
 }

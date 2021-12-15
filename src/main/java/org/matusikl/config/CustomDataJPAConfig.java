@@ -22,7 +22,9 @@ import java.util.Properties;
 @ComponentScan(basePackages = "org.matusikl.service")
 @Configuration
 public class CustomDataJPAConfig {
-
+    //Tutaj to wszystko można zstąpić poprzez plik application,properties z których spring sam zaczyta wszelakie informacje,
+    //Masz wtedy tylko propertisy z danymi i nie musisz samemu tworzyć tych wszystkich beanów....
+    // https://springframework.guru/configuring-spring-boot-for-microsoft-sql-server/
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean entityManagerFactory = new LocalContainerEntityManagerFactoryBean();
