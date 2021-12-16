@@ -1,5 +1,6 @@
 package org.matusikl.service;
 
+import org.matusikl.exception.DataNotFoundException;
 import org.matusikl.model.Laptop;
 import org.matusikl.repository.LaptopRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,14 +18,22 @@ public class LaptopService {
         this.laptopRepository = laptopRepository;
     }
 
-    public Laptop getLaptop(){
-        Laptop laptop = laptopRepository.findById(1).orElse(null);
+    public Laptop getLaptop(Integer id){
+        Laptop laptop = laptopRepository
+                .findById(id)
+                .orElseThrow(() -> new DataNotFoundException("Laptop not exist in database with id: " + id) {
+        });
         return laptop;
     }
 
     public List<Laptop> getLaptops(){
         List<Laptop> laptops = laptopRepository.findAll();
+        if(laptops.isEmpty()){
+            throw new DataNotFoundException("There are no laptops in database");
+        }
+        else{
         return laptops;
+        }
     }
 
     public void addLaptop(Laptop laptop){

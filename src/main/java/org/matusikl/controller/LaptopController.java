@@ -1,12 +1,12 @@
 package org.matusikl.controller;
 
+import org.matusikl.exception.DataNotFoundException;
 import org.matusikl.model.Laptop;
 import org.matusikl.service.LaptopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
 import java.util.List;
 
@@ -21,15 +21,14 @@ public class LaptopController {
     }
 
     @GetMapping(value = "/laptops", produces = "application/json")
-    public ResponseEntity<List<Laptop>> getLaptops(){
-
+    public ResponseEntity<List<Laptop>> getLaptops() {
         return new ResponseEntity<>(laptopService.getLaptops(), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/laptop", produces = "application/json")
-    public ResponseEntity<Laptop> getLaptop(){
+    @GetMapping(value = "/laptop/{id}", produces = "application/json")
+    public ResponseEntity<Laptop> getLaptop(@PathVariable("id") Integer id){
 
-        return new ResponseEntity<>(laptopService.getLaptop(), HttpStatus.OK);
+        return new ResponseEntity<>(laptopService.getLaptop(id), HttpStatus.OK);
     }
 
     @PostMapping(value = "/add/laptop", consumes = "application/json", produces = "text/plain")
@@ -50,4 +49,5 @@ public class LaptopController {
         laptopService.updateLaptop(idLaptop, laptop);
         return new ResponseEntity<>(laptop, HttpStatus.OK);
     }
+
 }
