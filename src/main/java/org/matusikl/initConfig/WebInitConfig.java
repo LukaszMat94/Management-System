@@ -4,8 +4,6 @@ import org.matusikl.config.CustomDataJPAConfig;
 import org.matusikl.config.CustomWebMvcConfig;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
-import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 public class WebInitConfig extends AbstractAnnotationConfigDispatcherServletInitializer {
@@ -21,7 +19,7 @@ public class WebInitConfig extends AbstractAnnotationConfigDispatcherServletInit
 
     @Override
     protected String[] getServletMappings() {
-        return new String[] {"/map/*"};
+        return new String[] {"/controller/*"};
     }
 
     @Override

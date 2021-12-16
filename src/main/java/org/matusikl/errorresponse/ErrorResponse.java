@@ -4,17 +4,17 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class LaptopErrorResponse implements Serializable {
+public class ErrorResponse implements Serializable {
     private String message;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private LocalDateTime time;
     private int status;
 
-    public LaptopErrorResponse(){
+    public ErrorResponse(){
 
     }
 
-    public LaptopErrorResponse(String message, LocalDateTime time, int status) {
+    public ErrorResponse(String message, LocalDateTime time, int status) {
         this.message = message;
         this.time = time;
         this.status = status;

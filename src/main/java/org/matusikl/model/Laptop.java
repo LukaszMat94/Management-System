@@ -1,7 +1,6 @@
 package org.matusikl.model;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "MS_Laptop")
@@ -9,7 +8,6 @@ public class Laptop {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @NotNull
     @Column(name = "idLaptop")
     private Integer idLaptop;
     @Column(name = "nameLaptop")

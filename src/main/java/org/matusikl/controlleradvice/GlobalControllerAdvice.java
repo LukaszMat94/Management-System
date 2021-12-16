@@ -1,7 +1,8 @@
 package org.matusikl.controlleradvice;
 
 import com.alibaba.fastjson.JSON;
-import org.matusikl.errorresponse.LaptopErrorResponse;
+import org.matusikl.errorresponse.ErrorResponse;
+import org.matusikl.exception.DataDuplicateException;
 import org.matusikl.exception.DataNotFoundException;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
@@ -20,15 +21,27 @@ public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(DataNotFoundException.class)
     public Map<String, Object> handleDataNotFoundException(DataNotFoundException exception){
 
-            LaptopErrorResponse errorResponse = new LaptopErrorResponse();
+            ErrorResponse errorResponse = new ErrorResponse();
             errorResponse.setMessage(exception.getMessage());
             errorResponse.setTime(LocalDateTime.now());
             errorResponse.setStatus(HttpStatus.NOT_FOUND.value());
 
-            Map<String, Object> map = JSON.parseObject(JSON.toJSONString(errorResponse), Map.class);
-
-        return map;
+        return getJsonMap(errorResponse);
     }
 
+    @ExceptionHandler(DataDuplicateException.class)
+    public Map<String, Object> handleDataDuplicateException(DataDuplicateException exception){
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setMessage(exception.getMessage());
+        errorResponse.setTime(LocalDateTime.now());
+        errorResponse.setStatus(HttpStatus.CONFLICT.value());
+
+        return getJsonMap(errorResponse);
+    }
+
+    public Map<String, Object> getJsonMap(ErrorResponse errorResponse){
+        return JSON.parseObject(JSON.toJSONString(errorResponse), Map.class);
+    }
 
 }

@@ -1,8 +1,6 @@
 package org.matusikl.exception;
 
-import java.io.Serializable;
-
-public class DataNotFoundException extends RuntimeException implements Serializable {
+public class DataNotFoundException extends RuntimeException {
 
     public DataNotFoundException(String message){
         super(message);
