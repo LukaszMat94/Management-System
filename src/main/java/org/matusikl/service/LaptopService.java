@@ -1,5 +1,6 @@
 package org.matusikl.service;
 
+import org.matusikl.exception.DataDuplicateException;
 import org.matusikl.exception.DataNotFoundException;
 import org.matusikl.model.Laptop;
 import org.matusikl.repository.LaptopRepository;
@@ -37,22 +38,44 @@ public class LaptopService {
     }
 
     public void addLaptop(Laptop laptop){
-        laptopRepository.save(laptop);
+
+        boolean laptopExist = laptopRepository.findLaptopByNameLaptop(laptop.getNameLaptop()).isPresent();
+        if(laptopExist){
+            throw new DataDuplicateException("Cannot create laptop with the same laptop name: " + laptop.getNameLaptop());
+        }
+        else {
+            laptopRepository.save(laptop);
+        }
     }
 
     public void deleteLaptop(Integer idLaptop){
-        laptopRepository.deleteById(idLaptop);
+
+        boolean laptopExist = laptopRepository.existsById(idLaptop);
+        if(!laptopExist){
+            throw new DataNotFoundException("Cannot delete laptop with id: " + idLaptop + " because this not exist in database");
+        }
+        else{
+            laptopRepository.deleteById(idLaptop);
+        }
     }
 
     public Laptop updateLaptop(Integer id, Laptop laptop){
-        Laptop laptopDB = laptopRepository.findById(id).orElse(null);
 
-        laptopDB.setBrandLaptop(laptop.getBrandLaptop());
-        laptopDB.setNameLaptop(laptop.getNameLaptop());
-        laptopDB.setLoginLaptop(laptop.getLoginLaptop());
-        laptopDB.setPasswordLaptop(laptop.getPasswordLaptop());
+        Laptop laptopDB = laptopRepository
+                .findById(id)
+                .orElseThrow(() -> new DataNotFoundException("Cannot find laptop with id: " + id + " in database"));
 
-        laptopRepository.save(laptopDB);
-        return laptopDB;
+        boolean otherLaptopWithSameName = laptopRepository.findLaptopByNameLaptopAndOtherId(laptop.getNameLaptop(), id).isPresent();
+        if(!otherLaptopWithSameName){
+            laptopDB.setBrandLaptop(laptop.getBrandLaptop());
+            laptopDB.setNameLaptop(laptop.getNameLaptop());
+            laptopDB.setLoginLaptop(laptop.getLoginLaptop());
+            laptopDB.setPasswordLaptop(laptop.getPasswordLaptop());
+            laptopRepository.save(laptopDB);
+            return laptopDB;
+        }
+        else{
+            throw new DataDuplicateException("Laptop with name: " + laptop.getNameLaptop() + " already exist in database!");
+        }
     }
 }
