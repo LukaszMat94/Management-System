@@ -2,22 +2,20 @@ package org.matusikl.errorresponse;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 public class ErrorResponse implements Serializable {
     private String message;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
-    private LocalDateTime time;
     private int status;
+    private ZonedDateTime dateTime;
 
-    public ErrorResponse(){
-
+    public ErrorResponse(String message, int status, ZonedDateTime dateTime ) {
+        this.message = message;
+        this.status = status;
+        this.dateTime = dateTime;
     }
 
-    public ErrorResponse(String message, LocalDateTime time, int status) {
-        this.message = message;
-        this.time = time;
-        this.status = status;
+    public ErrorResponse() {
     }
 
     public String getMessage() {
@@ -28,19 +26,20 @@ public class ErrorResponse implements Serializable {
         this.message = message;
     }
 
-    public LocalDateTime getTime() {
-        return time;
-    }
-
-    public void setTime(LocalDateTime time) {
-        this.time = time;
-    }
-
     public int getStatus() {
         return status;
     }
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone="GMT")
+    public ZonedDateTime getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(ZonedDateTime dateTime) {
+        this.dateTime = dateTime;
     }
 }
