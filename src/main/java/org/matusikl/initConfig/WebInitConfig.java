@@ -2,6 +2,7 @@ package org.matusikl.initConfig;
 
 import org.matusikl.config.CustomDataJPAConfig;
 import org.matusikl.config.CustomWebMvcConfig;
+import org.matusikl.config.JSONConfig;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
@@ -9,7 +10,7 @@ import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatche
 public class WebInitConfig extends AbstractAnnotationConfigDispatcherServletInitializer {
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return new Class<?>[] { CustomDataJPAConfig.class };
+        return new Class<?>[] { CustomDataJPAConfig.class, JSONConfig.class};
     }
 
     @Override
@@ -29,5 +30,4 @@ public class WebInitConfig extends AbstractAnnotationConfigDispatcherServletInit
         servlet.setThrowExceptionIfNoHandlerFound(true);
         return servlet;
     }
-
 }
