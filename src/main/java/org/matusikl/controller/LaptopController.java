@@ -3,10 +3,17 @@ package org.matusikl.controller;
 import org.matusikl.model.Laptop;
 import org.matusikl.service.LaptopService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -34,8 +41,8 @@ public class LaptopController {
                 .body(laptopService.getLaptop(id));
     }
 
-    @PostMapping(value = "/add/laptop", consumes = "application/json", produces = {"text/plain", "application/json"})
-    public ResponseEntity<String> addLaptop(@RequestBody Laptop laptop){
+    @PostMapping(value = "/add/laptop", consumes = "application/json", produces = {"application/json"})
+    public ResponseEntity<?> addLaptop(@Valid @RequestBody Laptop laptop){
         laptopService.addLaptop(laptop);
         return ResponseEntity
                 .ok()
@@ -54,7 +61,7 @@ public class LaptopController {
 
     @PutMapping(value = "/update/laptop/{id}", produces = {"text/plain", "application/json"})
     public ResponseEntity<Laptop> updateLaptop(@PathVariable ("id") Integer idLaptop,
-                                               @RequestBody Laptop laptop){
+                                               @Valid @RequestBody Laptop laptop){
         Laptop updatedLaptop = laptopService.updateLaptop(idLaptop, laptop);
         return ResponseEntity
                 .ok()
