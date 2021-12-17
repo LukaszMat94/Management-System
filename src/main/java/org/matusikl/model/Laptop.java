@@ -1,10 +1,11 @@
 package org.matusikl.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "MS_Laptop")
-public class Laptop {
+public class Laptop implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
