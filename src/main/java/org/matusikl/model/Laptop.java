@@ -1,6 +1,13 @@
 package org.matusikl.model;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.GenerationType;
+import javax.persistence.Column;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Entity
@@ -11,13 +18,17 @@ public class Laptop implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idLaptop")
     private Integer idLaptop;
+    @Size(min = 4, max = 20, message = "{laptop.namelaptop.size}")
     @Column(name = "nameLaptop")
     private String nameLaptop;
+    @NotEmpty(message = "{laptop.brandLaptop.empty}")
     @Column(name = "brandLaptop")
     private String brandLaptop;
     @Column(name = "loginLaptop")
+    @Size(min = 8, message = "{laptop.loginLaptop.size}")
     private String loginLaptop;
     @Column(name = "passwordLaptop")
+    @Size(min = 8, message = "{laptop.passwordLaptop.size}")
     private String passwordLaptop;
 //    @OneToOne
 //    private Employee employee;
