@@ -40,13 +40,12 @@ public class LaptopController {
                 .body(laptopService.getLaptop(id));
     }
 
-    @PostMapping(value = "/add/laptop", consumes = "application/json", produces = {"application/json"})
-    public ResponseEntity<?> addLaptop(@Valid @RequestBody Laptop laptop){
-        laptopService.addLaptop(laptop);
+    @PostMapping(value = "/add/laptop", produces = "application/json")
+    public ResponseEntity<Laptop> addLaptop(@Valid @RequestBody Laptop laptop){
+        Laptop addedLaptop = laptopService.addLaptop(laptop);
         return ResponseEntity
                 .ok()
-                .contentType(MediaType.TEXT_PLAIN)
-                .body("Laptop added");
+                .body(addedLaptop);
     }
 
     @DeleteMapping(value = "/delete/laptop/{id}", consumes = "application/json", produces = {"text/plain", "application/json"})
@@ -58,7 +57,7 @@ public class LaptopController {
                 .body("Laptop deleted");
     }
 
-    @PutMapping(value = "/update/laptop/{id}", produces = {"text/plain", "application/json"})
+    @PutMapping(value = "/update/laptop/{id}", produces =  "application/json")
     public ResponseEntity<Laptop> updateLaptop(@PathVariable ("id") Integer idLaptop,
                                                @Valid @RequestBody Laptop laptop){
         Laptop updatedLaptop = laptopService.updateLaptop(idLaptop, laptop);

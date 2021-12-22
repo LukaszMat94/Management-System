@@ -36,14 +36,15 @@ public class LaptopService {
         }
     }
 
-    public void addLaptop(Laptop laptop){
+    public Laptop addLaptop(Laptop laptop){
 
         boolean laptopExist = laptopRepository.findLaptopByNameLaptop(laptop.getNameLaptop()).isPresent();
         if(laptopExist){
             throw new DataDuplicateException("Cannot create laptop with the same laptop name: " + laptop.getNameLaptop());
         }
         else {
-            laptopRepository.save(laptop);
+            Laptop addedLaptop = laptopRepository.save(laptop);
+            return addedLaptop;
         }
     }
 

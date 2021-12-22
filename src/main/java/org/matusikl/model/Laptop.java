@@ -4,8 +4,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.GenerationType;
 import javax.persistence.Column;
+import javax.persistence.GenerationType;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -30,8 +31,8 @@ public class Laptop implements Serializable {
     @Column(name = "passwordLaptop")
     @Size(min = 8, message = "{laptop.passwordLaptop.size}")
     private String passwordLaptop;
-//    @OneToOne
-//    private Employee employee;
+    @OneToOne(mappedBy = "laptopEmployee")
+    private Employee employee;
 
     public Laptop(){
     }
@@ -85,13 +86,14 @@ public class Laptop implements Serializable {
         this.passwordLaptop = passwordLaptop;
     }
 
-//    public Employee getEmployee() {
-//        return employee;
-//    }
-//
-//    public void setEmployee(Employee employee) {
-//        this.employee = employee;
-//    }
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
+    }
+
     //endregion
 
     //region toString

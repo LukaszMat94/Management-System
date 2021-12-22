@@ -27,7 +27,7 @@ public class AccountService {
     }
 
     @Transactional
-    public void addAccount(Account account){
+    public Account addAccount(Account account){
         boolean accountExist = accountRepository
                 .findByLogin(account.getLogin())
                 .isPresent();
@@ -36,7 +36,8 @@ public class AccountService {
             throw new DataDuplicateException("Add failed! Account already exist with login: " + account.getLogin());
         }
         else {
-            accountRepository.save(account);
+            Account addedAccount = accountRepository.save(account);
+            return addedAccount;
         }
     }
 

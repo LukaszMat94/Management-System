@@ -5,7 +5,13 @@ import org.matusikl.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import javax.validation.Valid;
 
 @RestController
@@ -26,13 +32,12 @@ public class AccountController {
                 .body(account);
     }
 
-    @PostMapping(value = "/add/account", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<String> addAcount(@Valid @RequestBody Account account){
-        accountService.addAccount(account);
+    @PostMapping(value = "/add/account", produces = "application/json")
+    public ResponseEntity<Account> addAcount(@Valid @RequestBody Account account){
+        Account addedAccount = accountService.addAccount(account);
         return ResponseEntity
                 .ok()
-                .contentType(MediaType.TEXT_PLAIN)
-                .body("Account added");
+                .body(addedAccount);
     }
 
     @DeleteMapping(value = "/delete/account/{id}", produces = "application/json")
