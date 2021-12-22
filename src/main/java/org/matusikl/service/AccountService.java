@@ -53,7 +53,7 @@ public class AccountService {
     }
 
     @Transactional
-    public Account updateAccount(Account account, Integer id){
+    public Account updateAccount(Account account, Integer id) throws Exception {
         Account accountDB = accountRepository
                 .findById(id)
                 .orElseThrow(() -> new DataNotFoundException("Update failed! Account with id: " + id + " not exist in database!"));

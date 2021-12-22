@@ -1,5 +1,8 @@
 package org.matusikl.model;
 
+import org.matusikl.encryptionaes256.EncryptionPassword;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -34,12 +37,16 @@ public class Account {
         this.login = login;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPassword() throws Exception {
+        EncryptionPassword encryptionPassword = new EncryptionPassword();
+        String decryptedPassword = encryptionPassword.decrypt(password);
+        return decryptedPassword;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPassword(String password) throws Exception {
+        EncryptionPassword encryptionPassword = new EncryptionPassword();
+        String encryptedPassword = encryptionPassword.encrypt(password);
+        this.password = encryptedPassword;
     }
 
     public Integer getIdAccount() {

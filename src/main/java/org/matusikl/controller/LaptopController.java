@@ -1,5 +1,6 @@
 package org.matusikl.controller;
 
+import org.matusikl.encryptionaes256.EncryptionPassword;
 import org.matusikl.model.Laptop;
 import org.matusikl.service.LaptopService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class LaptopController {
     }
 
     @GetMapping(value = "/get/laptops", produces = "application/json")
-    public ResponseEntity<List<Laptop>> getLaptops() {
+    public ResponseEntity<List<Laptop>> getLaptops(){
         return ResponseEntity
                 .ok()
                 .body(laptopService.getLaptops());
@@ -59,7 +60,7 @@ public class LaptopController {
 
     @PutMapping(value = "/update/laptop/{id}", produces =  "application/json")
     public ResponseEntity<Laptop> updateLaptop(@PathVariable ("id") Integer idLaptop,
-                                               @Valid @RequestBody Laptop laptop){
+                                               @Valid @RequestBody Laptop laptop) throws Exception {
         Laptop updatedLaptop = laptopService.updateLaptop(idLaptop, laptop);
         return ResponseEntity
                 .ok()

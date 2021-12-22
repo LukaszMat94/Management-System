@@ -59,7 +59,7 @@ public class LaptopService {
         }
     }
 
-    public Laptop updateLaptop(Integer id, Laptop laptop){
+    public Laptop updateLaptop(Integer id, Laptop laptop) throws Exception {
 
         Laptop laptopDB = laptopRepository
                 .findById(id)

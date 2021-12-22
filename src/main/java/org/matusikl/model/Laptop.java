@@ -1,5 +1,7 @@
 package org.matusikl.model;
 
+import org.matusikl.encryptionaes256.EncryptionPassword;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -31,8 +33,8 @@ public class Laptop implements Serializable {
     @Column(name = "passwordLaptop")
     @Size(min = 8, message = "{laptop.passwordLaptop.size}")
     private String passwordLaptop;
-    @OneToOne(mappedBy = "laptopEmployee")
-    private Employee employee;
+//    @OneToOne(mappedBy = "laptopEmployee")
+//    private Employee employee;
 
     public Laptop(){
     }
@@ -78,21 +80,26 @@ public class Laptop implements Serializable {
         this.loginLaptop = loginLaptop;
     }
 
-    public String getPasswordLaptop() {
-        return passwordLaptop;
+    public String getPasswordLaptop() throws Exception {
+        EncryptionPassword encryptionPassword = new EncryptionPassword();
+        String decryptedPassword = encryptionPassword.decrypt(passwordLaptop);
+        return decryptedPassword;
+
     }
 
-    public void setPasswordLaptop(String passwordLaptop) {
-        this.passwordLaptop = passwordLaptop;
+    public void setPasswordLaptop(String passwordLaptop) throws Exception {
+        EncryptionPassword encryptionPassword = new EncryptionPassword();
+        String encryptedPassword = encryptionPassword.encrypt(passwordLaptop);
+        this.passwordLaptop = encryptedPassword;
     }
 
-    public Employee getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
-    }
+//    public Employee getEmployee() {
+//        return employee;
+//    }
+//
+//    public void setEmployee(Employee employee) {
+//        this.employee = employee;
+//    }
 
     //endregion
 

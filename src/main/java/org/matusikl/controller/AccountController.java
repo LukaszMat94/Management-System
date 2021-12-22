@@ -51,7 +51,7 @@ public class AccountController {
 
     @PutMapping(value = "/update/account/{id}", produces = "application/json")
     public ResponseEntity<Account> updateAccount(@PathVariable ("id") Integer id,
-                                                 @Valid @RequestBody Account account){
+                                                 @Valid @RequestBody Account account) throws Exception {
         Account updatedAccount = accountService.updateAccount(account, id);
         return ResponseEntity
                 .ok()
