@@ -1,5 +1,6 @@
 package org.matusikl.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -14,7 +15,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Entity
@@ -31,11 +32,14 @@ public class Employee {
     @Column(name = "surname")
     private String surnameEmployee;
     @Column(name = "birthday")
-    private Date birthdayEmployee;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    private ZonedDateTime birthdayEmployee;
     @Column(name = "employmentDate")
-    private Date employmentDateEmployee;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    private ZonedDateTime employmentDateEmployee;
     @Column(name = "dismissalDate")
-    private Date dismissalDateEmployee;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    private ZonedDateTime dismissalDateEmployee;
     @Column(name = "salary")
     private BigDecimal salaryEmployee;
     @Column(name = "personalIdentityNumber")
@@ -91,27 +95,27 @@ public class Employee {
         this.surnameEmployee = surnameEmployee;
     }
 
-    public Date getBirthdayEmployee() {
+    public ZonedDateTime getBirthdayEmployee() {
         return birthdayEmployee;
     }
 
-    public void setBirthdayEmployee(Date birthdayEmployee) {
+    public void setBirthdayEmployee(ZonedDateTime birthdayEmployee) {
         this.birthdayEmployee = birthdayEmployee;
     }
 
-    public Date getEmploymentDateEmployee() {
+    public ZonedDateTime getEmploymentDateEmployee() {
         return employmentDateEmployee;
     }
 
-    public void setEmploymentDateEmployee(Date employmentDateEmployee) {
+    public void setEmploymentDateEmployee(ZonedDateTime employmentDateEmployee) {
         this.employmentDateEmployee = employmentDateEmployee;
     }
 
-    public Date getDismissalDateEmployee() {
+    public ZonedDateTime getDismissalDateEmployee() {
         return dismissalDateEmployee;
     }
 
-    public void setDismissalDateEmployee(Date dismissalDateEmployee) {
+    public void setDismissalDateEmployee(ZonedDateTime dismissalDateEmployee) {
         this.dismissalDateEmployee = dismissalDateEmployee;
     }
 
