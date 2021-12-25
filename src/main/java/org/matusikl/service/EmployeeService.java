@@ -45,8 +45,8 @@ public class EmployeeService {
             throw new DataDuplicateException("Add employee failed! Employee with given personal identify number already exist");
         }
         else{
-        employeeRepository.save(employee);
-        return employee;
+            Employee employeeDB = employeeRepository.save(employee);
+            return employeeDB;
         }
     }
 
