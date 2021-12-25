@@ -1,19 +1,13 @@
 package org.matusikl.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.GenerationType;
-import javax.persistence.Column;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -21,6 +15,11 @@ import java.util.List;
 @Entity
 @Table(name = "MS_Employee")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@NamedEntityGraph(
+        name = "Employee.task",
+        attributeNodes = {
+                @NamedAttributeNode("taskList")
+        })
 public class Employee {
 
     @Id
@@ -51,20 +50,24 @@ public class Employee {
     private String emailEmployee;
     @OneToOne
     @JoinColumn(name = "idLaptop")
+    @JsonManagedReference
     private Laptop laptopEmployee;
     @ManyToMany
     @JoinTable(name = "MS_Employee_Role",
             joinColumns = @JoinColumn(name = "id_emp", referencedColumnName = "idEmployee"),
             inverseJoinColumns = @JoinColumn(name = "id_role", referencedColumnName = "id"))
+    @Fetch(FetchMode.SUBSELECT)
+    @LazyCollection(LazyCollectionOption.FALSE)
     private List<Role> roleEmployeeList;
 
     @ManyToOne
-    @JoinColumn(name = "id_job")
+    @JoinColumn(name = "idJob")
     private Job job;
     @ManyToMany
     @JoinTable(name = "MS_Employee_Task",
             joinColumns = @JoinColumn(name = "id_emp", referencedColumnName = "idEmployee"),
             inverseJoinColumns = @JoinColumn(name = "id_task", referencedColumnName = "idTask"))
+    @JsonIgnoreProperties("employeeList")
     private List<Task> taskList;
 
     public Employee() {
