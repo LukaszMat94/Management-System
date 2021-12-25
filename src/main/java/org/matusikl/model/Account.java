@@ -1,8 +1,6 @@
 package org.matusikl.model;
 
 import org.matusikl.encryptionaes256.EncryptionPassword;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
