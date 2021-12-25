@@ -1,17 +1,15 @@
 package org.matusikl.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.GenerationType;
-import javax.persistence.Column;
-import javax.persistence.ManyToMany;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import javax.persistence.*;
 import java.time.ZonedDateTime;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "MS_Task")
+@NamedEntityGraph(
+        name = "Task.employee",
+        attributeNodes = @NamedAttributeNode("employeeList"))
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +24,8 @@ public class Task {
     @Column(name = "endDate")
     private ZonedDateTime endDateTask;
     @ManyToMany(mappedBy = "taskList")
-    private List<Employee> employeeList;
+    @JsonIgnoreProperties("taskList")
+    private Set<Employee> employeeList;
 
     public Task() {
     }
@@ -71,11 +70,11 @@ public class Task {
         this.endDateTask = endDateTask;
     }
 
-    public List<Employee> getEmployeeList() {
+    public Set<Employee> getEmployeeList() {
         return employeeList;
     }
 
-    public void setEmployeeList(List<Employee> employeeList) {
+    public void setEmployeeList(Set<Employee> employeeList) {
         this.employeeList = employeeList;
     }
 }
