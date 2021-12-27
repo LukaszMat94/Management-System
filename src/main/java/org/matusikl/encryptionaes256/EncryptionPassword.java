@@ -1,14 +1,12 @@
 package org.matusikl.encryptionaes256;
 
 import java.util.Base64;
-import org.springframework.stereotype.Component;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESedeKeySpec;
 import java.security.spec.KeySpec;
 
-@Component
 public class EncryptionPassword {
     private static final String FORMAT = "UTF8";
     private static final String SECURITY_SCHEME = "DESede";

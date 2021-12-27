@@ -1,6 +1,5 @@
 package org.matusikl.controller;
 
-import org.matusikl.encryptionaes256.EncryptionPassword;
 import org.matusikl.model.Laptop;
 import org.matusikl.service.LaptopService;
 import org.springframework.beans.factory.annotation.Autowired;
