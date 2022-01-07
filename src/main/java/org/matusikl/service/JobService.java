@@ -22,7 +22,7 @@ public class JobService {
     public Job getJob(Integer id){
         Job job = jobRepository
                 .findById(id)
-                .orElseThrow(() -> new DataNotFoundException("Get job failed! Cannot find job with id: " + id + " in database!"));
+                .orElseThrow(() -> new DataNotFoundException(String.format("Get job failed! Cannot find job with id: %d in database!", id)));
         return job;
     }
 
@@ -42,7 +42,7 @@ public class JobService {
                 .findByJob(job.getJob())
                 .isPresent();
         if(jobExist){
-            throw new DataDuplicateException("Add job failed! Job with name: " + job.getJob() + " already exist in database!");
+            throw new DataDuplicateException(String.format("Add job failed! Job with name: %s already exist in database!", job.getJob()));
         }
         else{
             Job newJob = jobRepository.save(job);
@@ -52,12 +52,11 @@ public class JobService {
 
     @Transactional
     public void deleteJob(Integer id){
-        boolean jobExist = jobRepository.existsById(id);
-        if(jobExist){
+        if(jobRepository.existsById(id)){
             jobRepository.deleteById(id);
         }
         else{
-            throw new DataNotFoundException("Delete job failed There is no job with id: " + id + " in database");
+            throw new DataNotFoundException(String.format("Delete job failed There is no job with id: %d in database", id));
         }
     }
 
@@ -65,12 +64,12 @@ public class JobService {
     public Job updateJob(Integer id, Job job){
         Job jobDB = jobRepository
                 .findById(id)
-                .orElseThrow(() -> new DataNotFoundException("Update job failed! There is no job with id: " + id + " in database"));
+                .orElseThrow(() -> new DataNotFoundException(String.format("Update job failed! There is no job with id: %d in database", id)));
         boolean otherJobWithSameName = jobRepository
                 .findByNameJobAndOtherId(job.getJob(), id)
                 .isPresent();
         if(otherJobWithSameName){
-            throw new DataDuplicateException("Update job failed! There is already registered job with name: " + job.getJob() + " in database");
+            throw new DataDuplicateException(String.format("Update job failed! There is already registered job with name: $s in database", job.getJob()));
         }
         else{
             jobDB.setJob(job.getJob());

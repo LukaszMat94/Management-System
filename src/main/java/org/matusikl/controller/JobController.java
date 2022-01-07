@@ -24,7 +24,7 @@ public class JobController {
         this.jobService = jobService;
     }
 
-    @GetMapping(path = "/get/job/{id}", produces = "application/json")
+    @GetMapping(path = "/jobs/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Job> getJob(@PathVariable ("id") Integer id){
         Job job = jobService.getJob(id);
         return ResponseEntity
@@ -32,7 +32,7 @@ public class JobController {
                 .body(job);
     }
 
-    @GetMapping(path = "/get/jobs", produces = "application/json")
+    @GetMapping(path = "/jobs", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Job>> getJobs(){
         List<Job> jobList = jobService.getJobs();
         return ResponseEntity
@@ -40,7 +40,7 @@ public class JobController {
                 .body(jobList);
     }
 
-    @PostMapping(path = "/add/job", produces = "application/json")
+    @PostMapping(path = "/jobs", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Job> addJob(@RequestBody Job job){
         Job addedJob = jobService.addJob(job);
         return ResponseEntity
@@ -48,15 +48,15 @@ public class JobController {
                 .body(addedJob);
     }
 
-    @DeleteMapping(path = "/delete/job/{id}", produces = {"application/json", "text/plain"})
+    @DeleteMapping(path = "/jobs/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity<String> deleteJob(@PathVariable ("id") Integer id){
         jobService.deleteJob(id);
         return ResponseEntity.ok()
                 .contentType(MediaType.TEXT_PLAIN)
-                .body("Job with id: " + id + " deleted");
+                .body(String.format("Job with id: %d deleted", id));
     }
 
-    @PutMapping("/update/job/{id}")
+    @PutMapping(path = "/jobs/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Job> updateJob(@PathVariable ("id") Integer id,
                                          @RequestBody Job job){
         Job updatedJob = jobService.updateJob(id, job);
