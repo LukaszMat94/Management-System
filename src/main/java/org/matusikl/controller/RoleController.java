@@ -24,7 +24,7 @@ public class RoleController {
         this.roleService = roleService;
     }
 
-    @GetMapping(path = "/get/role/{id}", produces = "application/json")
+    @GetMapping(path = "/roles/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Role> getRole(@PathVariable ("id") Integer id){
         Role role = roleService.getRole(id);
         return ResponseEntity
@@ -32,7 +32,7 @@ public class RoleController {
                 .body(role);
     }
 
-    @GetMapping(path = "/get/roles", produces = "application/json")
+    @GetMapping(path = "/roles", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Role>> getRoles(){
         List<Role> roleList = roleService.getRoles();
         return ResponseEntity
@@ -40,7 +40,7 @@ public class RoleController {
                 .body(roleList);
     }
 
-    @PostMapping(path = "/add/role", produces = "application/json")
+    @PostMapping(path = "/roles", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Role> addRole(@RequestBody Role role){
         Role addedRole = roleService.addRole(role);
         return ResponseEntity
@@ -48,16 +48,16 @@ public class RoleController {
                 .body(addedRole);
     }
 
-    @DeleteMapping(path = "/delete/role/{id}", produces = {"application/json", "text/plain"})
+    @DeleteMapping(path = "/roles/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity<String> deleteRole(@PathVariable ("id") Integer id){
         roleService.deleteRole(id);
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.TEXT_PLAIN)
-                .body("Role deleted");
+                .body(String.format("Role with id: %d deleted", id));
     }
 
-    @PutMapping(path = "/update/role/{id}", produces = "application/json")
+    @PutMapping(path = "/roles/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Role> updateRole(@RequestBody Role role,
                                            @PathVariable ("id") Integer id){
         Role updatedRole = roleService.updateRole(role, id);

@@ -22,7 +22,7 @@ public class RoleService {
     public Role getRole(Integer id){
         Role role = roleRepository
                 .findById(id)
-                .orElseThrow(() -> new DataNotFoundException("Get role failed! Can't find role with id: " + id + " in database!"));
+                .orElseThrow(() -> new DataNotFoundException(String.format("Get role failed! Can't find role with id: %d in database!", id)));
         return role;
     }
 
@@ -37,7 +37,7 @@ public class RoleService {
                 .findByRole(role.getRole())
                 .isPresent();
         if(roleExist){
-            throw new DataDuplicateException("Added role failed! Role with name: " + role.getRole() + " already exist!");
+            throw new DataDuplicateException(String.format("Added role failed! Role with name: %s already exist!", role.getRole()));
         }
         else{
             Role addedRole = roleRepository.save(role);
@@ -47,12 +47,11 @@ public class RoleService {
 
     @Transactional
     public void deleteRole(Integer id){
-        boolean roleExist = roleRepository.existsById(id);
-        if(roleExist){
+        if(roleRepository.existsById(id)){
             roleRepository.deleteById(id);
         }
         else{
-            throw new DataNotFoundException("Delete role failed! Role with id: " + id + " not exist in database!");
+            throw new DataNotFoundException(String.format("Delete role failed! Role with id: %d not exist in database!", id));
         }
     }
 
@@ -60,13 +59,13 @@ public class RoleService {
     public Role updateRole(Role role, Integer id){
         Role roleDB = roleRepository
                 .findById(id)
-                .orElseThrow(() -> new DataNotFoundException("Updated role failed! Cannot find role with id: " + id + " in database!"));
+                .orElseThrow(() -> new DataNotFoundException(String.format("Updated role failed! Cannot find role with id: %d in database!", id)));
 
         boolean roleExist = roleRepository
                 .findByRole(role.getRole())
                 .isPresent();
         if(roleExist){
-            throw new DataDuplicateException("Updated role failed! Role with name: " + role.getRole() + " already exist in database!");
+            throw new DataDuplicateException(String.format("Updated role failed! Role with name: %s already exist in database!",role.getRole()));
         }
         else{
             roleDB.setRole(role.getRole());
