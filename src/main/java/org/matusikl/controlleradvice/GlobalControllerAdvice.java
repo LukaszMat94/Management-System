@@ -26,7 +26,9 @@ public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
         errorResponse.setMessage(exception.getMessage());
         errorResponse.setDateTime(ZonedDateTime.now());
         errorResponse.setStatus(HttpStatus.NOT_FOUND.value());
-        return ResponseEntity.badRequest().body(errorResponse);
+        return ResponseEntity
+                .badRequest()
+                .body(errorResponse);
     }
 
     @ExceptionHandler(DataDuplicateException.class)
@@ -36,11 +38,16 @@ public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
         errorResponse.setMessage(exception.getMessage());
         errorResponse.setDateTime(ZonedDateTime.now());
         errorResponse.setStatus(HttpStatus.CONFLICT.value());
-        return ResponseEntity.badRequest().body(errorResponse);
+        return ResponseEntity
+                .badRequest()
+                .body(errorResponse);
     }
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+                                                                  HttpHeaders headers,
+                                                                  HttpStatus status,
+                                                                  WebRequest request) {
         List<ErrorResponse> errorList = new ArrayList<>();
         for(ObjectError error : ex.getBindingResult().getAllErrors()){
             errorList.add(new ErrorResponse(
@@ -48,7 +55,9 @@ public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
                     HttpStatus.BAD_REQUEST.value(),
                     ZonedDateTime.now()));
         }
-        return ResponseEntity.badRequest().body(errorList);
+        return ResponseEntity
+                .badRequest()
+                .body(errorList);
     }
 }
 
