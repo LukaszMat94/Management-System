@@ -22,7 +22,7 @@ public class EmployeeService {
     public Employee getEmployee(Integer id){
         Employee employee = employeeRepository
                 .findById(id)
-                .orElseThrow(() -> new DataNotFoundException("Get employee failed! There is no employee with id: " + id + " in database"));
+                .orElseThrow(() -> new DataNotFoundException(String.format("Get employee failed! There is no employee with id: %d in database", id)));
         return employee;
     }
 
@@ -52,12 +52,11 @@ public class EmployeeService {
 
     @Transactional
     public void deleteEmployee(Integer id){
-        boolean existEmployee = employeeRepository.existsById(id);
-        if(existEmployee){
+        if(employeeRepository.existsById(id)){
             employeeRepository.deleteById(id);
         }
         else{
-            throw new DataNotFoundException("Delete employee failed! There is no employee with id: " + id + " in database");
+            throw new DataNotFoundException(String.format("Delete employee failed! There is no employee with id: %d in database", id));
         }
     }
 
@@ -65,7 +64,7 @@ public class EmployeeService {
     public Employee updateEmployee(Integer id, Employee employee){
         Employee employeeDB = employeeRepository
                 .findById(id)
-                .orElseThrow(() -> new DataNotFoundException("Update employee failed! There is no employee with id: " + id + " in database"));
+                .orElseThrow(() -> new DataNotFoundException(String.format("Update employee failed! There is no employee with id: %d in database", id)));
         boolean otherEmployeeWithSameIdentifyNumber = employeeRepository
                 .findByPersonalIdentityNumberEmployeWithOtherID(employee.getPersonalIdentityNumberEmployee(), id)
                 .isPresent();

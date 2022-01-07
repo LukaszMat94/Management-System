@@ -24,7 +24,7 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    @GetMapping(path = "/get/employee/{id}", produces = "application/json")
+    @GetMapping(path = "/employees/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Employee> getEmployee(@PathVariable ("id") Integer id){
         Employee employee = employeeService.getEmployee(id);
         return ResponseEntity
@@ -32,7 +32,7 @@ public class EmployeeController {
                 .body(employee);
     }
 
-    @GetMapping(path = "/get/employees", produces = "application/json")
+    @GetMapping(path = "/employees", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Employee>> getEmployees(){
         List<Employee> employeeList = employeeService.getEmployees();
         return ResponseEntity
@@ -40,7 +40,7 @@ public class EmployeeController {
                 .body(employeeList);
     }
 
-    @PostMapping(path = "/add/employee", produces = "application/json")
+    @PostMapping(path = "/employees", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Employee> addEmployee(@RequestBody Employee employee){
         Employee addedEmployee = employeeService.addEmployee(employee);
         return ResponseEntity
@@ -48,16 +48,16 @@ public class EmployeeController {
                 .body(addedEmployee);
     }
 
-    @DeleteMapping(path = "/delete/employee/{id}", produces = {"application/json", "text/plain"})
+    @DeleteMapping(path = "/employees/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity<String> deleteEmployee(@PathVariable ("id") Integer id){
         employeeService.deleteEmployee(id);
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.TEXT_PLAIN)
-                .body("Deleted employee with id: " + id);
+                .body(String.format("Deleted employee with id: %d",id));
     }
 
-    @PutMapping(path = "/update/employe/{id}", produces = "application/json")
+    @PutMapping(path = "/employees/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Employee> updateEmployee(@PathVariable ("id") Integer id,
                                                    @RequestBody Employee employee){
         Employee updatedEmployee = employeeService.updateEmployee(id, employee);
