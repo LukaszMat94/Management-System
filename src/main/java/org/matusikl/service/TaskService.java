@@ -21,7 +21,7 @@ public class TaskService {
     public Task getTask(Integer id){
         Task task = taskRepository
                 .findById(id)
-                .orElseThrow(() -> new DataNotFoundException("Get task failed! There is no task with id: " + id + " in database"));
+                .orElseThrow(() -> new DataNotFoundException(String.format("Get task failed! There is no task with id: %d in database", id)));
         return task;
     }
 
@@ -43,12 +43,11 @@ public class TaskService {
 
     @Transactional
     public void deleteTask(Integer id){
-        boolean existTask = taskRepository.existsById(id);
-        if(existTask){
+        if(taskRepository.existsById(id)){
             taskRepository.deleteById(id);
         }
         else{
-            throw new DataNotFoundException("Delete task failed!: There is no task with id: " + id + " in database");
+            throw new DataNotFoundException(String.format("Delete task failed!: There is no task with id: %d in database", id));
         }
     }
 
@@ -56,7 +55,7 @@ public class TaskService {
     public Task updateTask(Integer id, Task task){
         Task taskDB = taskRepository
                 .findById(id)
-                .orElseThrow(() -> new DataNotFoundException("Update task failed! There is no task with id: " + id + " in database"));
+                .orElseThrow(() -> new DataNotFoundException(String.format("Update task failed! There is no task with id: %d in database", id)));
         taskDB.setNameTask(task.getNameTask());
         taskDB.setDescriptionTask(task.getDescriptionTask());
         taskDB.setStartDateTask(task.getStartDateTask());

@@ -1,7 +1,16 @@
 package org.matusikl.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.Table;
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Set;
 
@@ -10,26 +19,32 @@ import java.util.Set;
 @NamedEntityGraph(
         name = "Task.employee",
         attributeNodes = @NamedAttributeNode("employeeList"))
-public class Task {
+public class Task implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idTask")
     private Integer idTask;
+
     @Column(name = "name")
     private String nameTask;
+
     @Column(name = "description")
     private String descriptionTask;
+
     @Column(name = "startDate")
     private ZonedDateTime startDateTask;
+
     @Column(name = "endDate")
     private ZonedDateTime endDateTask;
+
     @ManyToMany(mappedBy = "taskList")
     @JsonIgnoreProperties("taskList")
     private Set<Employee> employeeList;
 
     public Task() {
     }
-
+    //region Getters-Setters
     public Integer getIdTask() {
         return idTask;
     }
@@ -77,4 +92,5 @@ public class Task {
     public void setEmployeeList(Set<Employee> employeeList) {
         this.employeeList = employeeList;
     }
+    //endregion
 }

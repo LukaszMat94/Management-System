@@ -24,7 +24,7 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    @GetMapping(path = "/get/task/{id}", produces = "application/json")
+    @GetMapping(path = "/tasks/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Task> getTask(@PathVariable ("id") Integer id){
         Task task = taskService.getTask(id);
         return ResponseEntity
@@ -32,7 +32,7 @@ public class TaskController {
                 .body(task);
     }
 
-    @GetMapping(path = "/get/tasks", produces = "application/json")
+    @GetMapping(path = "/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Task>> getTasks(){
         List<Task> taskList = taskService.getTasks();
         return ResponseEntity
@@ -40,7 +40,7 @@ public class TaskController {
                 .body(taskList);
     }
 
-    @PostMapping(path = "/add/task", produces = "application/json")
+    @PostMapping(path = "/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Task> addTask(@RequestBody Task task){
         Task addedTask = taskService.addTask(task);
         return ResponseEntity
@@ -48,16 +48,16 @@ public class TaskController {
                 .body(addedTask);
     }
 
-    @DeleteMapping(path = "/delete/task/{id}", produces = {"application/json", "text/plain"})
+    @DeleteMapping(path = "/tasks/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity<String> deleteTask(@PathVariable ("id") Integer id){
         taskService.deleteTask(id);
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.TEXT_PLAIN)
-                .body("Task with id: " + id + " deleted");
+                .body(String.format("Task with id: %d deleted", id));
     }
 
-    @PutMapping(value = "/update/task/{id}", produces = "application/json")
+    @PutMapping(value = "/tasks/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Task> updateTask(@PathVariable ("id") Integer id, @RequestBody Task task){
         Task updatedTask = taskService.updateTask(id, task);
         return ResponseEntity
