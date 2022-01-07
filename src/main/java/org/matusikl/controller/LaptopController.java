@@ -25,22 +25,21 @@ public class LaptopController {
         this.laptopService = laptopService;
     }
 
-    @GetMapping(value = "/get/laptops", produces = "application/json")
+    @GetMapping(value = "/laptops", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Laptop>> getLaptops(){
         return ResponseEntity
                 .ok()
                 .body(laptopService.getLaptops());
     }
 
-    @GetMapping(value = "/get/laptop/{id}", produces = "application/json")
+    @GetMapping(value = "/laptops/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Laptop> getLaptop(@PathVariable("id") Integer id){
-
         return ResponseEntity
                 .ok()
                 .body(laptopService.getLaptop(id));
     }
 
-    @PostMapping(value = "/add/laptop", produces = "application/json")
+    @PostMapping(value = "/laptops", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Laptop> addLaptop(@Valid @RequestBody Laptop laptop){
         Laptop addedLaptop = laptopService.addLaptop(laptop);
         return ResponseEntity
@@ -48,16 +47,16 @@ public class LaptopController {
                 .body(addedLaptop);
     }
 
-    @DeleteMapping(value = "/delete/laptop/{id}", consumes = "application/json", produces = {"text/plain", "application/json"})
+    @DeleteMapping(value = "/laptops/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity<String> deleteLaptop(@PathVariable ("id") Integer idLaptop){
         laptopService.deleteLaptop(idLaptop);
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.TEXT_PLAIN)
-                .body("Laptop deleted");
+                .body(String.format("Laptop with id: %d deleted", idLaptop));
     }
 
-    @PutMapping(value = "/update/laptop/{id}", produces =  "application/json")
+    @PutMapping(value = "/laptops/{id}", produces =  MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Laptop> updateLaptop(@PathVariable ("id") Integer idLaptop,
                                                @Valid @RequestBody Laptop laptop) throws Exception {
         Laptop updatedLaptop = laptopService.updateLaptop(idLaptop, laptop);

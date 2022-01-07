@@ -21,7 +21,7 @@ public class LaptopService {
     public Laptop getLaptop(Integer id){
         Laptop laptop = laptopRepository
                 .findById(id)
-                .orElseThrow(() -> new DataNotFoundException("Laptop not exist in database with id: " + id) {
+                .orElseThrow(() -> new DataNotFoundException(String.format("Laptop not exist in database with id: %d" ,id)) {
         });
         return laptop;
     }
@@ -40,7 +40,7 @@ public class LaptopService {
 
         boolean laptopExist = laptopRepository.findLaptopByNameLaptop(laptop.getNameLaptop()).isPresent();
         if(laptopExist){
-            throw new DataDuplicateException("Cannot create laptop with the same laptop name: " + laptop.getNameLaptop());
+            throw new DataDuplicateException(String.format("Cannot create laptop with the same laptop name: %s", laptop.getNameLaptop()));
         }
         else {
             Laptop addedLaptop = laptopRepository.save(laptop);
@@ -49,13 +49,11 @@ public class LaptopService {
     }
 
     public void deleteLaptop(Integer idLaptop){
-
-        boolean laptopExist = laptopRepository.existsById(idLaptop);
-        if(!laptopExist){
-            throw new DataNotFoundException("Cannot delete laptop with id: " + idLaptop + " because this not exist in database");
+        if(laptopRepository.existsById(idLaptop)){
+            laptopRepository.deleteById(idLaptop);
         }
         else{
-            laptopRepository.deleteById(idLaptop);
+            throw new DataNotFoundException(String.format("Cannot delete laptop with id: %d because this not exist in database", idLaptop));
         }
     }
 
@@ -63,9 +61,12 @@ public class LaptopService {
 
         Laptop laptopDB = laptopRepository
                 .findById(id)
-                .orElseThrow(() -> new DataNotFoundException("Cannot find laptop with id: " + id + " in database"));
+                .orElseThrow(() -> new DataNotFoundException(String.format("Cannot find laptop with id: %d in database", id)));
 
-        boolean otherLaptopWithSameName = laptopRepository.findLaptopByNameLaptopAndOtherId(laptop.getNameLaptop(), id).isPresent();
+        boolean otherLaptopWithSameName = laptopRepository
+                .findLaptopByNameLaptopAndOtherId(laptop.getNameLaptop(), id)
+                .isPresent();
+
         if(!otherLaptopWithSameName){
             laptopDB.setBrandLaptop(laptop.getBrandLaptop());
             laptopDB.setNameLaptop(laptop.getNameLaptop());
@@ -75,7 +76,7 @@ public class LaptopService {
             return laptopDB;
         }
         else{
-            throw new DataDuplicateException("Laptop with name: " + laptop.getNameLaptop() + " already exist in database!");
+            throw new DataDuplicateException(String.format("Laptop with name: %s already exist in database!", laptop.getNameLaptop()));
         }
     }
 }

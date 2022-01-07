@@ -21,18 +21,23 @@ public class Laptop implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idLaptop")
     private Integer idLaptop;
+
     @Size(min = 4, max = 20, message = "{laptop.namelaptop.size}")
     @Column(name = "nameLaptop")
     private String nameLaptop;
+
     @NotEmpty(message = "{laptop.brandLaptop.empty}")
     @Column(name = "brandLaptop")
     private String brandLaptop;
+
     @Column(name = "loginLaptop")
     @Size(min = 8, message = "{laptop.loginLaptop.size}")
     private String loginLaptop;
+
     @Column(name = "passwordLaptop")
     @Size(min = 8, message = "{laptop.passwordLaptop.size}")
     private String passwordLaptop;
+
     @OneToOne(mappedBy = "laptopEmployee")
     @JsonBackReference
     private Employee employee;
