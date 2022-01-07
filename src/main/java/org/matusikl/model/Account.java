@@ -9,17 +9,21 @@ import javax.persistence.Column;
 import javax.persistence.GenerationType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "MS_Account")
-public class Account {
+public class Account implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idAccount")
     private Integer idAccount;
+
     @Size(min = 8, message = "{account.login.size}")
     @NotNull(message = "{account.login.null}")
     private String login;
+
     @Size(min = 8, message = "{account.password.size}")
     private String password;
 

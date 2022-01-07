@@ -24,7 +24,7 @@ public class AccountController {
         this.accountService =  accountService;
     }
 
-    @GetMapping(value = "/get/account/{id}", produces = "application/json")
+    @GetMapping(path = "/accounts/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Account> getAccount(@PathVariable ("id") Integer id){
         Account account = accountService.getAccount(id);
         return ResponseEntity
@@ -32,7 +32,7 @@ public class AccountController {
                 .body(account);
     }
 
-    @PostMapping(value = "/add/account", produces = "application/json")
+    @PostMapping(path = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Account> addAcount(@Valid @RequestBody Account account){
         Account addedAccount = accountService.addAccount(account);
         return ResponseEntity
@@ -40,16 +40,16 @@ public class AccountController {
                 .body(addedAccount);
     }
 
-    @DeleteMapping(value = "/delete/account/{id}", produces = "application/json")
+    @DeleteMapping(path = "/accounts/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> deleteAccount(@PathVariable ("id") Integer id){
         accountService.deleteAccount(id);
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.TEXT_PLAIN)
-                .body("Account deleted");
+                .body(String.format("Account with id: %d deleted", id));
     }
 
-    @PutMapping(value = "/update/account/{id}", produces = "application/json")
+    @PutMapping(path = "/accounts/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Account> updateAccount(@PathVariable ("id") Integer id,
                                                  @Valid @RequestBody Account account) throws Exception {
         Account updatedAccount = accountService.updateAccount(account, id);
