@@ -1,20 +1,101 @@
 package org.matusikl.model;
 
-import java.sql.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.List;
 
-public class Employee {
+@Entity
+@Table(name = "MS_Employee")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@NamedEntityGraph(
+        name = "Employee.task",
+        attributeNodes = {
+                @NamedAttributeNode("taskList")
+        })
+public class Employee implements Serializable {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idEmployee")
     private Integer idEmployee;
+
+    @Column(name = "name")
     private String nameEmployee;
+
+    @Column(name = "surname")
     private String surnameEmployee;
-    private Date birthdayEmployee;
-    private Date employmentDateEmployee;
-    private Date dismissalDateEmployee;
-    private int salaryEmployee;
+
+    @Column(name = "birthday")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    private ZonedDateTime birthdayEmployee;
+
+    @Column(name = "employmentDate")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    private ZonedDateTime employmentDateEmployee;
+
+    @Column(name = "dismissalDate")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    private ZonedDateTime dismissalDateEmployee;
+
+    @Column(name = "salary")
+    private BigDecimal salaryEmployee;
+
+    @Column(name = "personalIdentityNumber")
     private String personalIdentityNumberEmployee;
+
+    @OneToOne
+    @JoinColumn(name = "idAccount")
     private Account accountEmployee;
+
+    @Column(name = "email")
     private String emailEmployee;
+
+    @OneToOne
+    @JoinColumn(name = "idLaptop")
+    @JsonManagedReference
     private Laptop laptopEmployee;
+
+    @ManyToMany
+    @JoinTable(name = "MS_Employee_Role",
+            joinColumns = @JoinColumn(name = "id_emp", referencedColumnName = "idEmployee"),
+            inverseJoinColumns = @JoinColumn(name = "id_role", referencedColumnName = "id"))
+    @Fetch(FetchMode.SUBSELECT)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private List<Role> roleEmployeeList;
+
+    @ManyToOne
+    @JoinColumn(name = "idJob")
+    private Job job;
+
+    @ManyToMany
+    @JoinTable(name = "MS_Employee_Task",
+            joinColumns = @JoinColumn(name = "id_emp", referencedColumnName = "idEmployee"),
+            inverseJoinColumns = @JoinColumn(name = "id_task", referencedColumnName = "idTask"))
+    @JsonIgnoreProperties("employeeList")
+    private List<Task> taskList;
 
     public Employee() {
     }
@@ -44,35 +125,35 @@ public class Employee {
         this.surnameEmployee = surnameEmployee;
     }
 
-    public Date getBirthdayEmployee() {
+    public ZonedDateTime getBirthdayEmployee() {
         return birthdayEmployee;
     }
 
-    public void setBirthdayEmployee(Date birthdayEmployee) {
+    public void setBirthdayEmployee(ZonedDateTime birthdayEmployee) {
         this.birthdayEmployee = birthdayEmployee;
     }
 
-    public Date getEmploymentDateEmployee() {
+    public ZonedDateTime getEmploymentDateEmployee() {
         return employmentDateEmployee;
     }
 
-    public void setEmploymentDateEmployee(Date employmentDateEmployee) {
+    public void setEmploymentDateEmployee(ZonedDateTime employmentDateEmployee) {
         this.employmentDateEmployee = employmentDateEmployee;
     }
 
-    public Date getDismissalDateEmployee() {
+    public ZonedDateTime getDismissalDateEmployee() {
         return dismissalDateEmployee;
     }
 
-    public void setDismissalDateEmployee(Date dismissalDateEmployee) {
+    public void setDismissalDateEmployee(ZonedDateTime dismissalDateEmployee) {
         this.dismissalDateEmployee = dismissalDateEmployee;
     }
 
-    public int getSalaryEmployee() {
+    public BigDecimal getSalaryEmployee() {
         return salaryEmployee;
     }
 
-    public void setSalaryEmployee(int salaryEmployee) {
+    public void setSalaryEmployee(BigDecimal salaryEmployee) {
         this.salaryEmployee = salaryEmployee;
     }
 
@@ -107,6 +188,31 @@ public class Employee {
     public void setLaptopEmployee(Laptop laptopEmployee) {
         this.laptopEmployee = laptopEmployee;
     }
+
+    public List<Role> getRoleEmployeeList() {
+        return roleEmployeeList;
+    }
+
+    public void setRoleEmployeeList(List<Role> roleEmployeeList) {
+        this.roleEmployeeList = roleEmployeeList;
+    }
+
+    public Job getJob() {
+        return job;
+    }
+
+    public void setJob(Job job) {
+        this.job = job;
+    }
+
+    public List<Task> getTaskList() {
+        return taskList;
+    }
+
+    public void setTaskList(List<Task> taskList) {
+        this.taskList = taskList;
+    }
+
     //endregion
 
 //region ToString
@@ -123,7 +229,6 @@ public class Employee {
         sb.append(", personalIdentityNumberEmployee=").append(personalIdentityNumberEmployee);
         sb.append(", accountEmployee=").append(accountEmployee);
         sb.append(", emailEmployee='").append(emailEmployee).append('\'');
-        sb.append(", laptopEmployee=").append(laptopEmployee);
         sb.append('}');
         return sb.toString();
     }

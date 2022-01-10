@@ -1,25 +1,46 @@
 package org.matusikl.model;
 
-import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.matusikl.encryptionaes256.EncryptionPassword;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Column;
+import javax.persistence.GenerationType;
+import javax.persistence.OneToOne;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "MS_Laptop")
-public class Laptop {
+public class Laptop implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idLaptop")
     private Integer idLaptop;
+
+    @Size(min = 4, max = 20, message = "{laptop.namelaptop.size}")
     @Column(name = "nameLaptop")
     private String nameLaptop;
+
+    @NotEmpty(message = "{laptop.brandLaptop.empty}")
     @Column(name = "brandLaptop")
     private String brandLaptop;
+
     @Column(name = "loginLaptop")
+    @Size(min = 8, message = "{laptop.loginLaptop.size}")
     private String loginLaptop;
+
     @Column(name = "passwordLaptop")
+    @Size(min = 8, message = "{laptop.passwordLaptop.size}")
     private String passwordLaptop;
-//    @OneToOne
-//    private Employee employee;
+
+    @OneToOne(mappedBy = "laptopEmployee")
+    @JsonBackReference
+    private Employee employee;
 
     public Laptop(){
     }
@@ -65,21 +86,27 @@ public class Laptop {
         this.loginLaptop = loginLaptop;
     }
 
-    public String getPasswordLaptop() {
-        return passwordLaptop;
+    public String getPasswordLaptop() throws Exception {
+        EncryptionPassword encryptionPassword = new EncryptionPassword();
+        String decryptedPassword = encryptionPassword.decrypt(passwordLaptop);
+        return decryptedPassword;
+
     }
 
-    public void setPasswordLaptop(String passwordLaptop) {
-        this.passwordLaptop = passwordLaptop;
+    public void setPasswordLaptop(String passwordLaptop) throws Exception {
+        EncryptionPassword encryptionPassword = new EncryptionPassword();
+        String encryptedPassword = encryptionPassword.encrypt(passwordLaptop);
+        this.passwordLaptop = encryptedPassword;
     }
 
-//    public Employee getEmployee() {
-//        return employee;
-//    }
-//
-//    public void setEmployee(Employee employee) {
-//        this.employee = employee;
-//    }
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
+    }
+
     //endregion
 
     //region toString
