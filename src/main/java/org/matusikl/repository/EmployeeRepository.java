@@ -20,4 +20,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
     @Override
     @EntityGraph(value = "Employee.task", type = EntityGraphType.LOAD)
     List<Employee> findAll();
+
+    @Override
+    @EntityGraph(value = "Employee.task", type = EntityGraphType.LOAD)
+    Optional<Employee> findById(Integer id);
 }

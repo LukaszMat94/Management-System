@@ -9,6 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
+import javax.persistence.NamedSubgraph;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
@@ -16,9 +18,27 @@ import java.util.Set;
 
 @Entity
 @Table(name = "MS_Task")
-@NamedEntityGraph(
-        name = "Task.employee",
-        attributeNodes = @NamedAttributeNode("employeeList"))
+@NamedEntityGraphs({
+        @NamedEntityGraph(
+            name = "Task.employee",
+            attributeNodes = @NamedAttributeNode(value = "employeeList", subgraph = "employeeAtributes"),
+            subgraphs = @NamedSubgraph(name = "employeeAtributes",
+                attributeNodes = {
+                        @NamedAttributeNode(value = "accountEmployee"),
+                        @NamedAttributeNode(value = "job"),
+                        @NamedAttributeNode(value = "laptopEmployee")
+                })),
+        @NamedEntityGraph(
+            name = "Task.employee.role",
+            attributeNodes = @NamedAttributeNode(value = "employeeList", subgraph = "employeeAtributes"),
+            subgraphs = @NamedSubgraph(name = "employeeAtributes",
+                attributeNodes = {
+                    @NamedAttributeNode(value = "accountEmployee"),
+                    @NamedAttributeNode(value = "job"),
+                    @NamedAttributeNode(value = "laptopEmployee"),
+                    @NamedAttributeNode(value = "roleEmployeeList")
+                }))
+        })
 public class Task implements Serializable {
 
     @Id

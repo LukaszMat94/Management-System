@@ -2,19 +2,34 @@ package org.matusikl.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.matusikl.encryptionaes256.EncryptionPassword;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Column;
 import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedSubgraph;
+import javax.persistence.NamedEntityGraph;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "MS_Laptop")
+@NamedEntityGraph(
+        name = "Laptop.employee",
+        attributeNodes = @NamedAttributeNode(value = "employee", subgraph = "employeeAtributes"),
+        subgraphs = @NamedSubgraph(name = "employeeAtributes",
+                attributeNodes = {
+                        @NamedAttributeNode(value = "accountEmployee"),
+                        @NamedAttributeNode(value = "job"),
+                        @NamedAttributeNode(value = "laptopEmployee"),
+                        @NamedAttributeNode(value = "taskList")
+                }
+        )
+)
 public class Laptop implements Serializable {
 
     @Id

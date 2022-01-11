@@ -33,7 +33,10 @@ import java.util.List;
 @NamedEntityGraph(
         name = "Employee.task",
         attributeNodes = {
-                @NamedAttributeNode("taskList")
+                @NamedAttributeNode("taskList"),
+                @NamedAttributeNode("laptopEmployee"),
+                @NamedAttributeNode("job"),
+                @NamedAttributeNode("accountEmployee")
         })
 public class Employee implements Serializable {
 
