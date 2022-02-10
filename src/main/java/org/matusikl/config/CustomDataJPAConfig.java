@@ -1,5 +1,6 @@
 package org.matusikl.config;
 
+import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -39,13 +40,13 @@ public class CustomDataJPAConfig {
         dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
         dataSource.setUrl("jdbc:sqlserver://LucasPC\\SQLEXPRESS;databaseName=Management System");
         dataSource.setUsername("Administrator");
-        dataSource.setPassword("admin1");
+        dataSource.setPassword("admin2");
         return dataSource;
     }
 
     Properties getProperties(){
         Properties properties = new Properties();
-        properties.setProperty("hibernate.hbm2ddl.auto", "update");
+        properties.setProperty("hibernate.hbm2ddl.auto", "none");
         properties.setProperty("hibernate.dialect" ,"org.hibernate.dialect.SQLServer2012Dialect");
         properties.setProperty("hibernate.show_sql" ,"true");
         properties.setProperty("hibernate.jdbc.time_zone", "UTC");
@@ -62,5 +63,15 @@ public class CustomDataJPAConfig {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
         return transactionManager;
+    }
+
+    @Bean
+    public SpringLiquibase liquibase() {
+        SpringLiquibase liquibase = new SpringLiquibase();
+        liquibase.setChangeLog("classpath:liquibase-changelog.xml");
+        liquibase.setDataSource(dataSource());
+        liquibase.setDropFirst(false);
+        liquibase.setShouldRun(true);
+        return liquibase;
     }
 }
