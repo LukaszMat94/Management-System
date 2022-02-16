@@ -13,6 +13,7 @@ import javax.persistence.NamedEntityGraph;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
@@ -46,7 +47,8 @@ public class Laptop implements Serializable {
     private String brandLaptop;
 
     @Column(name = "loginLaptop")
-    @Size(min = 8, message = "{laptop.loginLaptop.size}")
+    @Pattern(message = "{laptop.login.pattern}",
+            regexp = "[a-zA-Z0-9]{8,}$")
     private String loginLaptop;
 
     @Column(name = "passwordLaptop")

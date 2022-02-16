@@ -38,11 +38,17 @@ public class EmployeeService {
 
     @Transactional
     public Employee addEmployee(Employee employee){
-        boolean existEmployee = employeeRepository
+        boolean existEmployeeByPID = employeeRepository
                 .findByPersonalIdentityNumberEmployee(employee.getPersonalIdentityNumberEmployee())
                 .isPresent();
-        if(existEmployee){
+        boolean existEmployeeByEmail = employeeRepository
+                .findByEmailEmployee(employee.getEmailEmployee())
+                .isPresent();
+        if(existEmployeeByPID){
             throw new DataDuplicateException("Add employee failed! Employee with given personal identify number already exist");
+        }
+        else if(existEmployeeByEmail){
+            throw new DataDuplicateException("Add employee failed! Employee with given email already exist");
         }
         else{
             Employee employeeDB = employeeRepository.save(employee);
@@ -66,10 +72,18 @@ public class EmployeeService {
                 .findById(id)
                 .orElseThrow(() -> new DataNotFoundException(String.format("Update employee failed! There is no employee with id: %d in database", id)));
         boolean otherEmployeeWithSameIdentifyNumber = employeeRepository
-                .findByPersonalIdentityNumberEmployeWithOtherID(employee.getPersonalIdentityNumberEmployee(), id)
+                .findByPersonalIdentityNumberEmployeeWithOtherID(employee.getPersonalIdentityNumberEmployee(), id)
                 .isPresent();
+
+        boolean otherEmployeeWithSameEmail = employeeRepository
+                .findByEmailWithOtherID(employee.getEmailEmployee(), id)
+                .isPresent();
+
         if(otherEmployeeWithSameIdentifyNumber){
             throw new DataDuplicateException("Update employee failed! There is already employee with given personal id number");
+        }
+        else if(otherEmployeeWithSameEmail){
+            throw new DataDuplicateException("Update employee failed! There is already employee with given email");
         }
         else{
             employeeDB.setNameEmployee(employee.getNameEmployee());

@@ -60,7 +60,7 @@ public class AccountService {
                 .findByLoginAndIdAccountNot(account.getLogin(), id)
                 .isPresent();
         if(otherAccountWithSameLogin){
-            throw new DataNotFoundException(String.format("Update failed! Account with login: %s already exist in database!", account.getLogin()));
+            throw new DataDuplicateException(String.format("Update failed! Account with login: %s already exist in database!", account.getLogin()));
         }
         else{
             accountDB.setLogin(account.getLogin());

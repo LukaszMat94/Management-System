@@ -7,6 +7,7 @@ import javax.persistence.Table;
 import javax.persistence.GenerationType;
 import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
 @Entity
@@ -20,6 +21,7 @@ public class Role implements Serializable {
     private int idRole;
 
     @NotNull
+    @Pattern(message = "{role.role.pattern}", regexp = "^(ROLE_).*")
     private String role;
 
     public Role(){

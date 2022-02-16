@@ -27,7 +27,7 @@ public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
         errorResponse.setDateTime(ZonedDateTime.now());
         errorResponse.setStatus(HttpStatus.NOT_FOUND.value());
         return ResponseEntity
-                .badRequest()
+                .status(HttpStatus.NOT_FOUND)
                 .body(errorResponse);
     }
 
@@ -39,7 +39,7 @@ public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
         errorResponse.setDateTime(ZonedDateTime.now());
         errorResponse.setStatus(HttpStatus.CONFLICT.value());
         return ResponseEntity
-                .badRequest()
+                .status(HttpStatus.CONFLICT)
                 .body(errorResponse);
     }
 
@@ -56,7 +56,7 @@ public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
                     ZonedDateTime.now()));
         }
         return ResponseEntity
-                .badRequest()
+                .status(HttpStatus.BAD_REQUEST)
                 .body(errorList);
     }
 }

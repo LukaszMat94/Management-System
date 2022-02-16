@@ -22,6 +22,7 @@ import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -67,6 +68,7 @@ public class Employee implements Serializable {
     private BigDecimal salaryEmployee;
 
     @Column(name = "personalIdentityNumber")
+    @Pattern(message = "{employee.pid.pattern}", regexp = "^[0-9]{11}")
     private String personalIdentityNumberEmployee;
 
     @OneToOne
@@ -74,6 +76,7 @@ public class Employee implements Serializable {
     private Account accountEmployee;
 
     @Column(name = "email")
+    @Pattern(message = "{employee.email.pattern}", regexp = "^([_a-zA-Z0-9-]+(\\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*(\\.[a-zA-Z]{1,8}))?$")
     private String emailEmployee;
 
     @OneToOne
