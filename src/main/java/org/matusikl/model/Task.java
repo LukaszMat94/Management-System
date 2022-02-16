@@ -1,5 +1,6 @@
 package org.matusikl.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,9 +25,9 @@ import java.util.Set;
             attributeNodes = @NamedAttributeNode(value = "employeeList", subgraph = "employeeAtributes"),
             subgraphs = @NamedSubgraph(name = "employeeAtributes",
                 attributeNodes = {
-                        @NamedAttributeNode(value = "accountEmployee"),
-                        @NamedAttributeNode(value = "job"),
-                        @NamedAttributeNode(value = "laptopEmployee")
+                    @NamedAttributeNode(value = "accountEmployee"),
+                    @NamedAttributeNode(value = "job"),
+                    @NamedAttributeNode(value = "laptopEmployee")
                 })),
         @NamedEntityGraph(
             name = "Task.employee.role",
@@ -53,9 +54,11 @@ public class Task implements Serializable {
     private String descriptionTask;
 
     @Column(name = "startDate")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     private ZonedDateTime startDateTask;
 
     @Column(name = "endDate")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     private ZonedDateTime endDateTask;
 
     @ManyToMany(mappedBy = "taskList")

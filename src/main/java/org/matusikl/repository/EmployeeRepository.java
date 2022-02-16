@@ -14,8 +14,13 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 
     Optional<Employee> findByPersonalIdentityNumberEmployee(String idPersonalNumber);
 
+    Optional<Employee> findByEmailEmployee(String email);
+
     @Query("select e from Employee e where e.personalIdentityNumberEmployee = ?1 and e.idEmployee <> ?2")
-    Optional<Employee> findByPersonalIdentityNumberEmployeWithOtherID(String idPersonalNumber, Integer idEmployee);
+    Optional<Employee> findByPersonalIdentityNumberEmployeeWithOtherID(String idPersonalNumber, Integer idEmployee);
+
+    @Query("select e from Employee e where e.emailEmployee = ?1 and e.idEmployee <> ?2")
+    Optional<Employee> findByEmailWithOtherID(String email, Integer idEmployee);
 
     @Override
     @EntityGraph(value = "Employee.task", type = EntityGraphType.LOAD)

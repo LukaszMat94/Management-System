@@ -8,6 +8,7 @@ import javax.persistence.Table;
 import javax.persistence.Column;
 import javax.persistence.GenerationType;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
@@ -20,8 +21,9 @@ public class Account implements Serializable {
     @Column(name = "idAccount")
     private Integer idAccount;
 
-    @Size(min = 8, message = "{account.login.size}")
     @NotNull(message = "{account.login.null}")
+    @Pattern(message = "{account.login.pattern}",
+            regexp = "[a-zA-Z0-9]{8,}$")
     private String login;
 
     @Size(min = 8, message = "{account.password.size}")
