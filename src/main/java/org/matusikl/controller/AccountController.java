@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.matusikl.model.Account;
 import org.matusikl.service.AccountService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,8 @@ import javax.validation.Valid;
 
 @RestController
 public class AccountController {
+
+    private Logger logger = LoggerFactory.getLogger(AccountController.class);
 
     AccountService accountService;
 
@@ -40,8 +44,8 @@ public class AccountController {
     public ResponseEntity<Account> getAccount(@PathVariable ("id") Integer id){
         Account account = accountService.getAccount(id);
         return ResponseEntity
-                .ok()
-                .body(account);
+            .ok()
+            .body(account);
     }
 
     @Operation(summary = "Save account", description = "Save account with specified values", tags = "Account")
