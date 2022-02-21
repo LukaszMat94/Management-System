@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.matusikl.model.Account;
 import org.matusikl.service.AccountService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ import javax.validation.Valid;
 public class AccountController {
 
     AccountService accountService;
+    private Logger logger = LoggerFactory.getLogger(AccountController.class);
 
     @Autowired
     public AccountController(AccountService accountService){
@@ -38,10 +41,12 @@ public class AccountController {
             content = @Content)})
     @GetMapping(path = "/accounts/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Account> getAccount(@PathVariable ("id") Integer id){
+        logger.debug("In AccountController getAccount()");
         Account account = accountService.getAccount(id);
+        logger.info("Got account from service {}", account);
         return ResponseEntity
-                .ok()
-                .body(account);
+            .ok()
+            .body(account);
     }
 
     @Operation(summary = "Save account", description = "Save account with specified values", tags = "Account")
@@ -55,7 +60,9 @@ public class AccountController {
             content = @Content)})
     @PostMapping(path = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Account> addAcount(@Valid @RequestBody Account account){
+        logger.debug("In AccountController addAccount()");
         Account addedAccount = accountService.addAccount(account);
+        logger.info("Added account from service {}", addedAccount);
         return ResponseEntity
                 .ok()
                 .body(addedAccount);
@@ -70,7 +77,9 @@ public class AccountController {
                     content = @Content)})
     @DeleteMapping(path = "/accounts/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> deleteAccount(@PathVariable ("id") Integer id){
+        logger.debug("In AccountController deleteAccount()");
         accountService.deleteAccount(id);
+        logger.info("Deleted account id {} from service", id);
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.TEXT_PLAIN)
@@ -90,8 +99,10 @@ public class AccountController {
                     content = @Content)})
     @PutMapping(path = "/accounts/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Account> updateAccount(@PathVariable ("id") Integer id,
-                                                 @Valid @RequestBody Account account) throws Exception {
+                                                 @Valid @RequestBody Account account) {
+        logger.debug("In AccountController updateAccount()");
         Account updatedAccount = accountService.updateAccount(account, id);
+        logger.info("Updated account {} id {} from service", updatedAccount, id);
         return ResponseEntity
                 .ok()
                 .body(updatedAccount);

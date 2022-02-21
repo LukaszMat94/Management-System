@@ -1,6 +1,5 @@
 package org.matusikl.config;
 
-import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -63,15 +62,5 @@ public class CustomDataJPAConfig {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
         return transactionManager;
-    }
-
-    @Bean
-    public SpringLiquibase liquibase() {
-        SpringLiquibase liquibase = new SpringLiquibase();
-        liquibase.setChangeLog("classpath:liquibase-changelog.xml");
-        liquibase.setDataSource(dataSource());
-        liquibase.setDropFirst(false);
-        liquibase.setShouldRun(true);
-        return liquibase;
     }
 }

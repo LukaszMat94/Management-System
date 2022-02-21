@@ -24,7 +24,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
         org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration.class})
 @ComponentScan(basePackages = {"org.matusikl.controller", "org.matusikl.controlleradvice", "org.springdoc"})
 @PropertySource("classpath:/application.properties")
-public class CustomWebMvcConfig implements WebMvcConfigurer {
+public class CustomWebMvcConfig implements WebMvcConfigurer{
 
     @Override
     public Validator getValidator(){
