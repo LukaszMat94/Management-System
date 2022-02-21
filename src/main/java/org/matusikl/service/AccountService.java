@@ -22,13 +22,13 @@ public class AccountService {
     }
 
     public Account getAccount(Integer id){
-        logger.debug("In AccountService getAccount() method");
+        logger.debug("In AccountService getAccount()");
         Account account = accountRepository
                 .findById(id)
                 .orElseThrow(() -> {
                     DataNotFoundException exception = new DataNotFoundException(String.format("Get failed! Account not exist in database with id: %d", id));
-                    logger.error("Exception occured in getAccount: {} ", exception);
-                    return exception;
+                    logger.error("Exception occured in getAccount() id: {}", id, exception);
+                    throw exception;
                 });
         logger.info("Found account with id {}", id);
         return account;
@@ -36,7 +36,7 @@ public class AccountService {
 
     @Transactional
     public Account addAccount(Account account){
-        logger.debug("In AccountService addAccount() method");
+        logger.debug("In AccountService addAccount()");
         boolean accountExist = accountRepository
                 .findByLogin(account.getLogin())
                 .isPresent();
@@ -46,44 +46,45 @@ public class AccountService {
             throw exception;
         }
         else {
-            Account addedAccount = accountRepository.save(account);
-            logger.info("Account {} added successfully", account);
-            return addedAccount;
+            Account accountDB = accountRepository.save(account);
+            logger.info("Account {} added successfully", accountDB);
+            return accountDB;
         }
     }
 
     @Transactional
     public void deleteAccount(Integer id){
-        logger.debug("In AccountService deleteAccount() method");
+        logger.debug("In AccountService deleteAccount()");
         if(accountRepository.existsById(id)){
             accountRepository.deleteById(id);
             logger.info("Account id {} deleted successfully", id);
         }
         else {
             DataNotFoundException exception = new DataNotFoundException(String.format("Delete failed! Account with id: %d not exist in database!", id));
-            logger.error("Exception occured in deleteAccount id: {} ", id, exception);
+            logger.error("Exception occured in deleteAccount() id: {} ", id, exception);
             throw exception;
         }
     }
 
     @Transactional
     public Account updateAccount(Account account, Integer id){
-        logger.debug("In AccountService updateAccount() method");
+        logger.debug("In AccountService updateAccount()");
         Account accountDB = accountRepository
                 .findById(id)
                 .orElseThrow(() -> {
-                            DataNotFoundException exception = new DataNotFoundException(String.format("Update failed! Account with id: %d not exist in database!", id));
-                            logger.error("Error occured in update account findById()", exception);
-                            throw exception;
+                        DataNotFoundException exception = new DataNotFoundException(String.format("Update failed! Account with id: %d not exist in database!", id));
+                        logger.error("Error occured in updateAccount() findById()", exception);
+                        throw exception;
                 });
 
         boolean otherAccountWithSameLogin = accountRepository
                 .findByLoginAndIdAccountNot(account.getLogin(), id)
                 .isPresent();
+
         if(otherAccountWithSameLogin){
             DataDuplicateException exception = new DataDuplicateException(String.format("Update failed! Account with login: %s already exist in database!", account.getLogin()));
-            logger.error("Error occured in update account findByLoginAndIdAccountNot method", exception);
-            throw new DataDuplicateException(String.format("Update failed! Account with login: %s already exist in database!", account.getLogin()));
+            logger.error("Error occured in updateAccount() findByLoginAndIdAccountNot()", exception);
+            throw exception;
         }
         else{
             try {
@@ -93,7 +94,7 @@ public class AccountService {
                 logger.info("Account id {} updated successfully", id);
             }
             catch(Exception exception){
-                logger.error("Exception occured in update account set login/password", exception);
+                logger.error("Exception occured in updateAccount() id: {} , method set login/password", id, exception);
             }
         }
         return accountDB;

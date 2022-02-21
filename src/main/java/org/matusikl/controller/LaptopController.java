@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.matusikl.model.Laptop;
 import org.matusikl.service.LaptopService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,7 @@ import java.util.List;
 public class LaptopController {
 
     LaptopService laptopService;
+    private Logger logger = LoggerFactory.getLogger(LaptopController.class);
 
     @Autowired
     public LaptopController(LaptopService laptopService){
@@ -39,9 +42,12 @@ public class LaptopController {
                     content = @Content)})
     @GetMapping(value = "/laptops/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Laptop> getLaptop(@PathVariable("id") Integer id){
+        logger.debug("In LaptopController getLaptop()");
+        Laptop laptop = laptopService.getLaptop(id);
+        logger.info("Got laptop from service {}", laptop);
         return ResponseEntity
                 .ok()
-                .body(laptopService.getLaptop(id));
+                .body(laptop);
     }
 
     @Operation(summary = "Get laptops", description = "Get list of laptops", tags = "Laptop")
@@ -53,9 +59,12 @@ public class LaptopController {
                     content = @Content)})
     @GetMapping(value = "/laptops", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Laptop>> getLaptops(){
+        logger.debug("In LaptopController getLaptops()");
+        List<Laptop> listLaptops = laptopService.getLaptops();
+        logger.info("Got list of laptops from service");
         return ResponseEntity
                 .ok()
-                .body(laptopService.getLaptops());
+                .body(listLaptops);
     }
 
     @Operation(summary = "Save laptop", description = "Save specified laptop", tags = "Laptop")
@@ -69,7 +78,9 @@ public class LaptopController {
                     content = @Content)})
     @PostMapping(value = "/laptops", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Laptop> addLaptop(@Valid @RequestBody Laptop laptop){
+        logger.debug("In LaptopController addLaptop()");
         Laptop addedLaptop = laptopService.addLaptop(laptop);
+        logger.info("Added laptop from service {}", addedLaptop);
         return ResponseEntity
                 .ok()
                 .body(addedLaptop);
@@ -84,7 +95,9 @@ public class LaptopController {
                     content = @Content)})
     @DeleteMapping(value = "/laptops/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity<String> deleteLaptop(@PathVariable ("id") Integer idLaptop){
+        logger.debug("In LaptopController deleteLaptop()");
         laptopService.deleteLaptop(idLaptop);
+        logger.info("Deleted laptop id {} from service", idLaptop);
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.TEXT_PLAIN)
@@ -105,10 +118,11 @@ public class LaptopController {
     @PutMapping(value = "/laptops/{id}", produces =  MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Laptop> updateLaptop(@PathVariable ("id") Integer idLaptop,
                                                @Valid @RequestBody Laptop laptop) throws Exception {
+        logger.debug("In LaptopController updateLaptop()");
         Laptop updatedLaptop = laptopService.updateLaptop(idLaptop, laptop);
+        logger.info("Updated laptop {} id {} from service", updatedLaptop, idLaptop);
         return ResponseEntity
                 .ok()
                 .body(updatedLaptop);
     }
-
 }

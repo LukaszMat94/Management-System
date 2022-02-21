@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.matusikl.model.Job;
 import org.matusikl.service.JobService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ import java.util.List;
 public class JobController {
 
     JobService jobService;
+    private Logger logger = LoggerFactory.getLogger(JobController.class);
 
     @Autowired
     public JobController(JobService jobService){
@@ -38,7 +41,9 @@ public class JobController {
                     content = @Content)})
     @GetMapping(path = "/jobs/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Job> getJob(@PathVariable ("id") Integer id){
+        logger.debug("In JobController getJob()");
         Job job = jobService.getJob(id);
+        logger.info("Got job from service {}", job);
         return ResponseEntity
                 .ok()
                 .body(job);
@@ -53,7 +58,9 @@ public class JobController {
                     content = @Content)})
     @GetMapping(path = "/jobs", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Job>> getJobs(){
+        logger.debug("In JobController getJobs()");
         List<Job> jobList = jobService.getJobs();
+        logger.info("Got list of jobs from service");
         return ResponseEntity
                 .ok()
                 .body(jobList);
@@ -68,7 +75,9 @@ public class JobController {
                     content = @Content)})
     @PostMapping(path = "/jobs", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Job> addJob(@RequestBody Job job){
+        logger.debug("In JobController addJob()");
         Job addedJob = jobService.addJob(job);
+        logger.info("Added job from service {}", addedJob);
         return ResponseEntity
                 .ok()
                 .body(addedJob);
@@ -83,7 +92,9 @@ public class JobController {
                     content = @Content)})
     @DeleteMapping(path = "/jobs/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity<String> deleteJob(@PathVariable ("id") Integer id){
+        logger.debug("In JobController deleteJob()");
         jobService.deleteJob(id);
+        logger.info("Deleted job id {} from service", id);
         return ResponseEntity.ok()
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(String.format("Job with id: %d deleted", id));
@@ -101,7 +112,9 @@ public class JobController {
     @PutMapping(path = "/jobs/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Job> updateJob(@PathVariable ("id") Integer id,
                                          @RequestBody Job job){
+        logger.debug("In JobController updateJob()");
         Job updatedJob = jobService.updateJob(id, job);
+        logger.info("Updated job {} id {} from service", updatedJob, id);
         return ResponseEntity
                 .ok()
                 .body(updatedJob);

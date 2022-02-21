@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.matusikl.model.Role;
 import org.matusikl.service.RoleService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.validation.Valid;
 import java.util.List;
 
@@ -25,6 +26,7 @@ import java.util.List;
 public class RoleController {
 
     RoleService roleService;
+    private Logger logger = LoggerFactory.getLogger(RoleController.class);
 
     @Autowired
     public RoleController(RoleService roleService){
@@ -40,7 +42,9 @@ public class RoleController {
                     content = @Content)})
     @GetMapping(path = "/roles/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Role> getRole(@PathVariable("id") Integer id){
+        logger.debug("In RoleController getRole()");
         Role role = roleService.getRole(id);
+        logger.info("Got role from service {}", role);
         return ResponseEntity
                 .ok()
                 .body(role);
@@ -55,7 +59,9 @@ public class RoleController {
                     content = @Content)})
     @GetMapping(path = "/roles", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Role>> getRoles(){
+        logger.debug("In RoleController getRoles()");
         List<Role> roleList = roleService.getRoles();
+        logger.info("Got list of roles from service");
         return ResponseEntity
                 .ok()
                 .body(roleList);
@@ -72,7 +78,9 @@ public class RoleController {
                     content = @Content)})
     @PostMapping(path = "/roles", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Role> addRole(@Valid @RequestBody Role role){
+        logger.debug("In RoleController addRole()");
         Role addedRole = roleService.addRole(role);
+        logger.info("Added role from service {}", addedRole);
         return ResponseEntity
                 .ok()
                 .body(addedRole);
@@ -87,7 +95,9 @@ public class RoleController {
                     content = @Content)})
     @DeleteMapping(path = "/roles/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity<String> deleteRole(@PathVariable ("id") Integer id){
+        logger.debug("In RoleController deleteRole()");
         roleService.deleteRole(id);
+        logger.info("Deleted role id {} from service", id);
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.TEXT_PLAIN)
@@ -108,7 +118,9 @@ public class RoleController {
     @PutMapping(path = "/roles/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Role> updateRole(@Valid @RequestBody Role role,
                                            @PathVariable ("id") Integer id){
+        logger.debug("In RoleController updateRole()");
         Role updatedRole = roleService.updateRole(role, id);
+        logger.info("Updated role {} id {} from service", updatedRole, id);
         return ResponseEntity
                 .ok()
                 .body(updatedRole);
