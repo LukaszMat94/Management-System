@@ -1,7 +1,12 @@
 package org.matusikl.service;
 
+import org.matusikl.dto.taskdto.TaskGetDto;
+import org.matusikl.dto.taskdto.TaskPostDto;
 import org.matusikl.exception.DataNotFoundException;
+import org.matusikl.mapperinterface.TaskIMapper;
+import org.matusikl.model.Employee;
 import org.matusikl.model.Task;
+import org.matusikl.repository.EmployeeRepository;
 import org.matusikl.repository.TaskRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,15 +19,21 @@ import java.util.List;
 public class TaskService {
 
     TaskRepository taskRepository;
+    EmployeeRepository employeeRepository;
+    TaskIMapper taskIMapper;
     private Logger logger = LoggerFactory.getLogger(TaskService.class);
 
     @Autowired
-    public TaskService(TaskRepository taskRepository){
-        this.taskRepository =  taskRepository;
+    public TaskService(TaskRepository taskRepository,
+                       EmployeeRepository employeeRepository,
+                       TaskIMapper taskIMapper){
+        this.taskRepository = taskRepository;
+        this.employeeRepository = employeeRepository;
+        this.taskIMapper = taskIMapper;
     }
 
-    public Task getTask(Integer id){
-        logger.debug("In TaskService getTask() method");
+    public TaskGetDto getTask(Integer id){
+        logger.debug("In TaskService getTask() method id: {}", id);
         Task task = taskRepository
                 .findById(id)
                 .orElseThrow(() -> {
@@ -30,11 +41,12 @@ public class TaskService {
                         logger.error("Exception occured in getTask() id: {}", id, exception);
                         throw exception;
                 });
-        logger.info("Found task with id {}", id);
-        return task;
+        logger.info("Found task: {} with id: {}", task, id);
+        TaskGetDto taskGetDto = taskIMapper.taskToTaskGetDto(task);
+        return taskGetDto;
     }
 
-    public List<Task> getTasks(){
+    public List<TaskGetDto> getTasks(){
         logger.debug("In TaskService getTasks() method");
         List<Task> taskList = taskRepository.findAll();
         if(taskList.isEmpty()){
@@ -44,24 +56,27 @@ public class TaskService {
         }
         else{
             logger.info("Found list of tasks");
-            return taskList;
+            List<TaskGetDto> taskGetDtoList = taskIMapper.listTaskToListTaskGetDto(taskList);
+            return taskGetDtoList;
         }
     }
 
     @Transactional
-    public Task addTask(Task task){
-        logger.debug("In TaskService addTask() method");
+    public TaskGetDto addTask(TaskPostDto taskPostDto){
+        logger.debug("In TaskService addTask() method task: {}", taskPostDto);
+        Task task = taskIMapper.taskPostDtoToTask(taskPostDto);
         Task taskDB = taskRepository.save(task);
-        logger.info("Task {} added successfully", taskDB);
-        return taskDB;
+        logger.info("Task: {} added successfully", taskDB);
+        TaskGetDto taskGetDto = taskIMapper.taskToTaskGetDto(taskDB);
+        return taskGetDto;
     }
 
     @Transactional
     public void deleteTask(Integer id){
-        logger.debug("In TaskService deleteTask() method");
+        logger.debug("In TaskService deleteTask() method id: {}", id);
         if(taskRepository.existsById(id)){
             taskRepository.deleteById(id);
-            logger.info("Task id {} deleted successfully", id);
+            logger.info("Task id: {} deleted successfully", id);
         }
         else{
             DataNotFoundException exception = new DataNotFoundException(String.format("Delete task failed!: There is no task with id: %d in database", id));
@@ -71,21 +86,44 @@ public class TaskService {
     }
 
     @Transactional
-    public Task updateTask(Integer id, Task task){
-        logger.debug("In TaskService updateTask() method");
+    public TaskGetDto updateTask(Integer id, TaskPostDto taskPostDto){
+        logger.debug("In TaskService updateTask() method task: {} id: {}", taskPostDto, id);
         Task taskDB = taskRepository
                 .findById(id)
                 .orElseThrow(() -> {
                         DataNotFoundException exception = new DataNotFoundException(String.format("Update task failed! There is no task with id: %d in database", id));
-                        logger.error("Error occured in updateTask() findById()", exception);
+                        logger.error("Error occured in updateTask() findById() task: {} id: {}", taskPostDto, id, exception);
                         throw exception;
                 });
-        taskDB.setNameTask(task.getNameTask());
-        taskDB.setDescriptionTask(task.getDescriptionTask());
-        taskDB.setStartDateTask(task.getStartDateTask());
-        taskDB.setEndDateTask(task.getEndDateTask());
+        taskIMapper.updateTaskFromTaskPostDto(taskPostDto, taskDB);
         taskRepository.save(taskDB);
-        logger.info("Task id {} updated successfully", id);
-        return taskDB;
+        logger.info("Task: {} id: {} updated successfully", taskDB, id);
+        TaskGetDto taskGetDto = taskIMapper.taskToTaskGetDto(taskDB);
+        return taskGetDto;
+    }
+
+    @Transactional
+    public TaskGetDto assignEmployeeToTask(Integer idTask, Integer idEmp){
+        logger.debug("In TaskService assignEmployeeToTask() method idTask: {} idEmp: {}", idTask, idEmp);
+        Task task = taskRepository
+                .findById(idTask)
+                .orElseThrow(() -> {
+                    DataNotFoundException exception = new DataNotFoundException(String.format("Assign failed! There is no task in database with id: %s", idTask));
+                    logger.error("Error occured in TaskService assignEmployeeToTask() idTask: {} idEmp: {}", idTask, idEmp, exception);
+                    throw exception;
+                });
+        Employee employee = employeeRepository
+                .findById(idEmp)
+                .orElseThrow(() -> {
+                    DataNotFoundException exception = new DataNotFoundException(String.format("Assign failed! There is no employee in database with id: %s",idEmp));
+                    logger.error("Error occured in TaskService assignEmployeeToTask() idTask: {} idEmp: {}", idTask, idEmp, exception);
+                    throw exception;
+                });
+
+        task.getEmployeeList().add(employee);
+        taskRepository.save(task);
+        logger.info("Employee: {} idEmp: {} saved to Task: {} idTask: {} successfully", employee, idEmp, task, idTask);
+        TaskGetDto taskGetDto = taskIMapper.taskToTaskGetDto(task);
+        return taskGetDto;
     }
 }

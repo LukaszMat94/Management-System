@@ -1,10 +1,11 @@
 package org.matusikl.repository;
 
+import org.matusikl.model.Account;
 import org.matusikl.model.Employee;
+import org.matusikl.model.Laptop;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.EntityGraph.EntityGraphType;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
@@ -12,15 +13,17 @@ import java.util.Optional;
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 
-    Optional<Employee> findByPersonalIdentityNumberEmployee(String idPersonalNumber);
+    boolean existsByPersonalIdentityNumberEmployee(String idPersonalNumber);
 
-    Optional<Employee> findByEmailEmployee(String email);
+    boolean existsByEmailEmployee(String email);
 
-    @Query("select e from Employee e where e.personalIdentityNumberEmployee = ?1 and e.idEmployee <> ?2")
-    Optional<Employee> findByPersonalIdentityNumberEmployeeWithOtherID(String idPersonalNumber, Integer idEmployee);
+    boolean existsByPersonalIdentityNumberEmployeeAndIdEmployeeNot(String idPersonalNumber, Integer idEmployee);
 
-    @Query("select e from Employee e where e.emailEmployee = ?1 and e.idEmployee <> ?2")
-    Optional<Employee> findByEmailWithOtherID(String email, Integer idEmployee);
+    boolean existsByEmailEmployeeAndIdEmployeeNot(String email, Integer idEmployee);
+
+    boolean existsByAccountEmployee(Account account);
+
+    boolean existsByLaptopEmployee(Laptop laptop);
 
     @Override
     @EntityGraph(value = "Employee.task", type = EntityGraphType.LOAD)

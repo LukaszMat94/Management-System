@@ -5,7 +5,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.matusikl.model.Laptop;
+import org.matusikl.dto.laptopdto.LaptopGetDto;
+import org.matusikl.dto.laptopdto.LaptopPostDto;
 import org.matusikl.service.LaptopService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,14 +38,14 @@ public class LaptopController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found laptop with specified id",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Laptop.class))}),
+                            schema = @Schema(implementation = LaptopGetDto.class))}),
             @ApiResponse(responseCode = "404", description = "Error: not found in database",
                     content = @Content)})
     @GetMapping(value = "/laptops/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Laptop> getLaptop(@PathVariable("id") Integer id){
-        logger.debug("In LaptopController getLaptop()");
-        Laptop laptop = laptopService.getLaptop(id);
-        logger.info("Got laptop from service {}", laptop);
+    public ResponseEntity<LaptopGetDto> getLaptop(@PathVariable("id") Integer id){
+        logger.debug("In LaptopController getLaptop() id: {}", id);
+        LaptopGetDto laptop = laptopService.getLaptop(id);
+        logger.info("Got laptop: {} id: {} from service {}", laptop, id);
         return ResponseEntity
                 .ok()
                 .body(laptop);
@@ -54,13 +55,13 @@ public class LaptopController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found list of laptops",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Laptop.class))}),
+                            schema = @Schema(implementation = LaptopGetDto.class))}),
             @ApiResponse(responseCode = "404", description = "Error: not found in database",
                     content = @Content)})
     @GetMapping(value = "/laptops", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Laptop>> getLaptops(){
+    public ResponseEntity<List<LaptopGetDto>> getLaptops(){
         logger.debug("In LaptopController getLaptops()");
-        List<Laptop> listLaptops = laptopService.getLaptops();
+        List<LaptopGetDto> listLaptops = laptopService.getLaptops();
         logger.info("Got list of laptops from service");
         return ResponseEntity
                 .ok()
@@ -71,16 +72,16 @@ public class LaptopController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Saved specified laptop",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Laptop.class))}),
+                            schema = @Schema(implementation = LaptopGetDto.class))}),
             @ApiResponse(responseCode = "400", description = "Error: validation of attributes",
                     content = @Content),
             @ApiResponse(responseCode = "409", description = "Error: duplicate - data already exist in database",
                     content = @Content)})
     @PostMapping(value = "/laptops", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Laptop> addLaptop(@Valid @RequestBody Laptop laptop){
-        logger.debug("In LaptopController addLaptop()");
-        Laptop addedLaptop = laptopService.addLaptop(laptop);
-        logger.info("Added laptop from service {}", addedLaptop);
+    public ResponseEntity<LaptopGetDto> addLaptop(@Valid @RequestBody LaptopPostDto laptop){
+        logger.debug("In LaptopController addLaptop() laptop: {}", laptop);
+        LaptopGetDto addedLaptop = laptopService.addLaptop(laptop);
+        logger.info("Added laptop: {} from service", addedLaptop);
         return ResponseEntity
                 .ok()
                 .body(addedLaptop);
@@ -89,15 +90,16 @@ public class LaptopController {
     @Operation(summary = "Delete laptop", description = "Delete laptop with specified id", tags = "Laptop")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Deleted laptop with specified id",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Laptop.class))}),
+                    content = {@Content(mediaType = "application/json")}),
             @ApiResponse(responseCode = "404", description = "Error: not found in database",
+                    content = @Content),
+            @ApiResponse(responseCode = "409", description = "Error: laptop not detached from employee",
                     content = @Content)})
     @DeleteMapping(value = "/laptops/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity<String> deleteLaptop(@PathVariable ("id") Integer idLaptop){
-        logger.debug("In LaptopController deleteLaptop()");
+        logger.debug("In LaptopController deleteLaptop() id: {}", idLaptop);
         laptopService.deleteLaptop(idLaptop);
-        logger.info("Deleted laptop id {} from service", idLaptop);
+        logger.info("Deleted laptop id: {} from service", idLaptop);
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.TEXT_PLAIN)
@@ -108,7 +110,7 @@ public class LaptopController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Update laptop with specified id",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Laptop.class))}),
+                            schema = @Schema(implementation = LaptopGetDto.class))}),
             @ApiResponse(responseCode = "404", description = "Error: not found in database",
                     content = @Content),
             @ApiResponse(responseCode = "409", description = "Error: duplicate - data already exist in database",
@@ -116,11 +118,11 @@ public class LaptopController {
             @ApiResponse(responseCode = "400", description = "Error: validation of attributes",
                     content = @Content)})
     @PutMapping(value = "/laptops/{id}", produces =  MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Laptop> updateLaptop(@PathVariable ("id") Integer idLaptop,
-                                               @Valid @RequestBody Laptop laptop) throws Exception {
-        logger.debug("In LaptopController updateLaptop()");
-        Laptop updatedLaptop = laptopService.updateLaptop(idLaptop, laptop);
-        logger.info("Updated laptop {} id {} from service", updatedLaptop, idLaptop);
+    public ResponseEntity<LaptopGetDto> updateLaptop(@PathVariable ("id") Integer idLaptop,
+                                               @Valid @RequestBody LaptopPostDto laptop){
+        logger.debug("In LaptopController updateLaptop() id: {} laptop: {}", idLaptop, laptop);
+        LaptopGetDto updatedLaptop = laptopService.updateLaptop(idLaptop, laptop);
+        logger.info("Updated laptop: {} id: {} from service", updatedLaptop, idLaptop);
         return ResponseEntity
                 .ok()
                 .body(updatedLaptop);

@@ -1,7 +1,10 @@
 package org.matusikl.service;
 
+import org.matusikl.dto.jobdto.JobGetDto;
+import org.matusikl.dto.jobdto.JobPostDto;
 import org.matusikl.exception.DataDuplicateException;
 import org.matusikl.exception.DataNotFoundException;
+import org.matusikl.mapperinterface.JobIMapper;
 import org.matusikl.model.Job;
 import org.matusikl.repository.JobRepository;
 import org.slf4j.Logger;
@@ -15,15 +18,18 @@ import java.util.List;
 public class JobService {
 
     JobRepository jobRepository;
+    JobIMapper jobIMapper;
     private Logger logger = LoggerFactory.getLogger(JobService.class);
 
     @Autowired
-    public JobService(JobRepository jobRepository){
+    public JobService(JobRepository jobRepository,
+                      JobIMapper jobIMapper){
         this.jobRepository = jobRepository;
+        this.jobIMapper = jobIMapper;
     }
 
-    public Job getJob(Integer id){
-        logger.debug("In JobService getJob() method");
+    public JobGetDto getJob(Integer id){
+        logger.debug("In JobService getJob() method id: {}", id);
         Job job = jobRepository
                 .findById(id)
                 .orElseThrow(() -> {
@@ -31,11 +37,12 @@ public class JobService {
                         logger.error("Exception occured in getJob() id: {}", id, exception);
                         throw exception;
                 });
-        logger.info("Found job with id {}", id);
-        return job;
+        logger.info("Found job: {} with id: {}", job, id);
+        JobGetDto jobGetDto = jobIMapper.jobToJobGetDto(job);
+        return jobGetDto;
     }
 
-    public List<Job> getJobs(){
+    public List<JobGetDto> getJobs(){
         logger.debug("In JobService getJobs() method");
         List<Job> jobList = jobRepository.findAll();
         if(jobList.isEmpty()){
@@ -45,34 +52,37 @@ public class JobService {
         }
         else{
             logger.info("Found list of jobs");
-            return jobList;
+            List<JobGetDto> jobGetDtoList = jobIMapper.listJobToListJobGetDto(jobList);
+            return jobGetDtoList;
         }
     }
 
     @Transactional
-    public Job addJob(Job job){
-        logger.debug("In JobService addJob() method");
+    public JobGetDto addJob(JobPostDto jobPostDto){
+        logger.debug("In JobService addJob() method job: {}", jobPostDto);
+        Job job = jobIMapper.jobPostDtoToJob(jobPostDto);
         boolean jobExist = jobRepository
                 .findByJob(job.getJob())
                 .isPresent();
         if(jobExist){
             DataDuplicateException exception = new DataDuplicateException(String.format("Add job failed! Job with name: %s already exist in database!", job.getJob()));
-            logger.error("Exception occured in addJob(): {}", exception);
+            logger.error("Exception occured in addJob() job: {}", job, exception);
             throw exception;
         }
         else{
             Job jobDB = jobRepository.save(job);
-            logger.info("Job {} added successfully", jobDB);
-            return jobDB;
+            logger.info("Job: {} added successfully", jobDB);
+            JobGetDto jobGetDto = jobIMapper.jobToJobGetDto(jobDB);
+            return jobGetDto;
         }
     }
 
     @Transactional
     public void deleteJob(Integer id){
-        logger.debug("In JobService deleteJob() method");
+        logger.debug("In JobService deleteJob() method id: {}", id);
         if(jobRepository.existsById(id)){
             jobRepository.deleteById(id);
-            logger.info("Job id {} deleted successfully", id);
+            logger.info("Job id: {} deleted successfully", id);
         }
         else{
             DataNotFoundException exception = new DataNotFoundException(String.format("Delete job failed There is no job with id: %d in database", id));
@@ -82,13 +92,14 @@ public class JobService {
     }
 
     @Transactional
-    public Job updateJob(Integer id, Job job){
-        logger.debug("In JobService updateJob() method");
+    public JobGetDto updateJob(Integer id, JobPostDto jobPostDto){
+        logger.debug("In JobService updateJob() method id: {} job: {}", id, jobPostDto);
+        Job job = jobIMapper.jobPostDtoToJob(jobPostDto);
         Job jobDB = jobRepository
                 .findById(id)
                 .orElseThrow(() -> {
                         DataNotFoundException exception = new DataNotFoundException(String.format("Update job failed! There is no job with id: %d in database", id));
-                        logger.error("Error occured in updateJob() findById()", exception);
+                        logger.error("Error occured in updateJob() findById() id: {} job: {}", id, job, exception);
                         throw exception;
                 });
         boolean otherJobWithSameName = jobRepository
@@ -96,14 +107,15 @@ public class JobService {
                 .isPresent();
         if(otherJobWithSameName){
             DataDuplicateException exception = new DataDuplicateException(String.format("Update job failed! There is already registered job with name: $s in database", job.getJob()));
-            logger.error("Error occured in updateJob() findByNameJobAndOtherId()", exception);
+            logger.error("Error occured in updateJob() findByNameJobAndOtherId() id: {} job: {}", id, jobDB, exception);
             throw exception;
         }
         else{
-            jobDB.setJob(job.getJob());
+            jobIMapper.updateJobFromJobPostDto(jobPostDto, jobDB);
             jobRepository.save(jobDB);
-            logger.info("Job id {} updated successfully", id);
-            return jobDB;
+            logger.info("Job: {} id: {} updated successfully", jobDB, id);
+            JobGetDto jobGetDto = jobIMapper.jobToJobGetDto(jobDB);
+            return jobGetDto;
         }
     }
 

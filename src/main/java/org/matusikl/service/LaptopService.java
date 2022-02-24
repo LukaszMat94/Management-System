@@ -1,8 +1,13 @@
 package org.matusikl.service;
 
+import org.matusikl.dto.laptopdto.LaptopGetDto;
+import org.matusikl.dto.laptopdto.LaptopPostDto;
 import org.matusikl.exception.DataDuplicateException;
 import org.matusikl.exception.DataNotFoundException;
+import org.matusikl.exception.DataRelationException;
+import org.matusikl.mapperinterface.LaptopIMapper;
 import org.matusikl.model.Laptop;
+import org.matusikl.repository.EmployeeRepository;
 import org.matusikl.repository.LaptopRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,15 +19,21 @@ import java.util.List;
 public class LaptopService {
 
     LaptopRepository laptopRepository;
+    EmployeeRepository employeeRepository;
+    LaptopIMapper laptopIMapper;
     private Logger logger = LoggerFactory.getLogger(LaptopService.class);
 
     @Autowired
-    public LaptopService(LaptopRepository laptopRepository){
+    public LaptopService(LaptopRepository laptopRepository,
+                         EmployeeRepository employeeRepository,
+                         LaptopIMapper laptopIMapper){
         this.laptopRepository = laptopRepository;
+        this.employeeRepository = employeeRepository;
+        this.laptopIMapper = laptopIMapper;
     }
 
-    public Laptop getLaptop(Integer id){
-        logger.debug("In LaptopService getLaptop() method");
+    public LaptopGetDto getLaptop(Integer id){
+        logger.debug("In LaptopService getLaptop() method id: {}", id);
         Laptop laptop = laptopRepository
                 .findById(id)
                 .orElseThrow(() -> {
@@ -30,59 +41,71 @@ public class LaptopService {
                         logger.error("Exception occured in getLaptop() id: {}", id, exception);
                         throw exception;
                 });
-        logger.info("Found laptop with id {}", id);
-        return laptop;
+        logger.info("Found laptop: {} with id: {}", laptop, id);
+        LaptopGetDto laptopGetDto = laptopIMapper.laptopToLaptopGetDto(laptop);
+        return laptopGetDto;
     }
 
-    public List<Laptop> getLaptops(){
+    public List<LaptopGetDto> getLaptops(){
         logger.debug("In LaptopService getLaptops() method");
-        List<Laptop> laptops = laptopRepository.findAll();
-        if(laptops.isEmpty()){
+        List<Laptop> laptopList = laptopRepository.findAll();
+        if(laptopList.isEmpty()){
             DataNotFoundException exception =  new DataNotFoundException("There are no laptops in database");
             logger.error("Exception occured in getLaptops()", exception);
             throw exception;
         }
         else{
             logger.info("Found list of laptops");
-            return laptops;
+            List<LaptopGetDto> laptopGetDtoList = laptopIMapper.listLaptopToListLaptopGetDto(laptopList);
+            return laptopGetDtoList;
         }
     }
 
-    public Laptop addLaptop(Laptop laptop){
-        logger.debug("In LaptopService addLaptop() method");
+    public LaptopGetDto addLaptop(LaptopPostDto laptopPostDto){
+        logger.debug("In LaptopService addLaptop() method laptop: {}", laptopPostDto);
+        Laptop laptop = laptopIMapper.laptopPostDtoToLaptop(laptopPostDto);
         boolean laptopExist = laptopRepository.findLaptopByNameLaptop(laptop.getNameLaptop()).isPresent();
         if(laptopExist){
             DataDuplicateException exception = new DataDuplicateException(String.format("Cannot create laptop with the same laptop name: %s", laptop.getNameLaptop()));
-            logger.error("Exception occured in addLaptop(): {}", exception);
+            logger.error("Exception occured in addLaptop() laptop: {}", laptop, exception);
             throw exception;
         }
         else {
             Laptop laptopDB = laptopRepository.save(laptop);
-            logger.info("Laptop {} added successfully", laptopDB);
-            return laptopDB;
+            logger.info("Laptop: {} added successfully", laptopDB);
+            LaptopGetDto laptopGetDto = laptopIMapper.laptopToLaptopGetDto(laptopDB);
+            return laptopGetDto;
         }
     }
 
     public void deleteLaptop(Integer idLaptop){
         logger.debug("In LaptopService deleteLaptop() method");
-        if(laptopRepository.existsById(idLaptop)){
-            laptopRepository.deleteById(idLaptop);
-            logger.info("Laptop id {} deleted successfully", idLaptop);
+        Laptop laptop = laptopRepository
+                .findById(idLaptop)
+                .orElseThrow(() -> {
+                    DataNotFoundException exception = new DataNotFoundException(String.format("Cannot delete laptop with id: %d because this not exist in database", idLaptop));
+                    logger.error("Exception occured in deleteLaptop() id: {} ", idLaptop, exception);
+                    throw exception;
+        });
+        if(employeeRepository.existsByLaptopEmployee(laptop)){
+            DataRelationException exception = new DataRelationException(String.format("Delete failed! First you need to detach Employee from this Laptop id: %d", idLaptop));
+            logger.error("Exception occured in deleteLaptop() id: {} laptop not detached", idLaptop, exception);
+            throw exception;
         }
         else{
-            DataNotFoundException exception = new DataNotFoundException(String.format("Cannot delete laptop with id: %d because this not exist in database", idLaptop));
-            logger.error("Exception occured in deleteLaptop() id: {} ", idLaptop, exception);
-            throw exception;
+            laptopRepository.deleteById(idLaptop);
+            logger.info("Laptop id: {} deleted successfully", idLaptop);
         }
     }
 
-    public Laptop updateLaptop(Integer id, Laptop laptop) throws Exception {
-        logger.debug("In LaptopService updateLaptop() method");
+    public LaptopGetDto updateLaptop(Integer id, LaptopPostDto laptopPostDto){
+        logger.debug("In LaptopService updateLaptop() method id: {} laptop: {}", id, laptopPostDto);
+        Laptop laptop = laptopIMapper.laptopPostDtoToLaptop(laptopPostDto);
         Laptop laptopDB = laptopRepository
                 .findById(id)
                 .orElseThrow(() -> {
                         DataNotFoundException exception = new DataNotFoundException(String.format("Cannot find laptop with id: %d in database", id));
-                        logger.error("Error occured in updateLaptop() findById()", exception);
+                        logger.error("Error occured in updateLaptop() findById() id: {} laptop: {}", id, laptop, exception);
                         throw exception;
                 });
 
@@ -91,17 +114,15 @@ public class LaptopService {
                 .isPresent();
 
         if(!otherLaptopWithSameName){
-            laptopDB.setBrandLaptop(laptop.getBrandLaptop());
-            laptopDB.setNameLaptop(laptop.getNameLaptop());
-            laptopDB.setLoginLaptop(laptop.getLoginLaptop());
-            laptopDB.setPasswordLaptop(laptop.getPasswordLaptop());
+            laptopIMapper.updateLaptopFromLaptopPostDto(laptopPostDto ,laptopDB);
             laptopRepository.save(laptopDB);
-            logger.info("Laptop id {} updated successfully", id);
-            return laptopDB;
+            logger.info("Laptop: {} id: {} updated successfully", laptopDB, id);
+            LaptopGetDto laptopGetDto = laptopIMapper.laptopToLaptopGetDto(laptopDB);
+            return laptopGetDto;
         }
         else{
             DataDuplicateException exception = new DataDuplicateException(String.format("Laptop with name: %s already exist in database!", laptop.getNameLaptop()));
-            logger.error("Error occured in updateLaptop() findLaptopByNameLaptopAndOtherId()", exception);
+            logger.error("Error occured in updateLaptop() findLaptopByNameLaptopAndOtherId() id: {} laptop: {}", id, laptopDB, exception);
             throw exception;
         }
     }
