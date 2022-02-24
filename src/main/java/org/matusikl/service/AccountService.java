@@ -1,9 +1,14 @@
 package org.matusikl.service;
 
+import org.matusikl.dto.accountdto.AccountGetDto;
+import org.matusikl.dto.accountdto.AccountPostDto;
 import org.matusikl.exception.DataDuplicateException;
 import org.matusikl.exception.DataNotFoundException;
+import org.matusikl.exception.DataRelationException;
+import org.matusikl.mapperinterface.AccountIMapper;
 import org.matusikl.model.Account;
 import org.matusikl.repository.AccountRepository;
+import org.matusikl.repository.EmployeeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,15 +19,21 @@ import org.springframework.transaction.annotation.Transactional;
 public class AccountService {
 
     AccountRepository accountRepository;
+    EmployeeRepository employeeRepository;
+    AccountIMapper accountIMapper;
     private Logger logger = LoggerFactory.getLogger(AccountService.class);
 
     @Autowired
-    public AccountService(AccountRepository accountRepository){
+    public AccountService(AccountRepository accountRepository,
+                          EmployeeRepository employeeRepository,
+                          AccountIMapper accountIMapper) {
         this.accountRepository = accountRepository;
+        this.employeeRepository = employeeRepository;
+        this.accountIMapper = accountIMapper;
     }
 
-    public Account getAccount(Integer id){
-        logger.debug("In AccountService getAccount()");
+    public AccountGetDto getAccount(Integer id) {
+        logger.debug("In AccountService getAccount() id: {}", id);
         Account account = accountRepository
                 .findById(id)
                 .orElseThrow(() -> {
@@ -30,73 +41,80 @@ public class AccountService {
                     logger.error("Exception occured in getAccount() id: {}", id, exception);
                     throw exception;
                 });
+        AccountGetDto accountDTO = accountIMapper.accountToAccountGetDto(account);
         logger.info("Found account with id {}", id);
-        return account;
+        return accountDTO;
     }
 
     @Transactional
-    public Account addAccount(Account account){
-        logger.debug("In AccountService addAccount()");
+    public AccountGetDto addAccount(AccountPostDto accountPostDto) {
+        logger.debug("In AccountService addAccount() account: {}", accountPostDto);
         boolean accountExist = accountRepository
-                .findByLogin(account.getLogin())
+                .findByLogin(accountPostDto.getLogin())
                 .isPresent();
-        if(accountExist){
-            DataDuplicateException exception = new DataDuplicateException(String.format("Add failed! Account already exist with login: %s" ,account.getLogin()));
-            logger.error("Exception occured in addAccount: {}", exception);
+        if (accountExist) {
+            DataDuplicateException exception = new DataDuplicateException(String.format("Add failed! Account already exist with login: %s", accountPostDto.getLogin()));
+            logger.error("Exception occured in addAccount() account: {}", accountPostDto, exception);
             throw exception;
-        }
-        else {
-            Account accountDB = accountRepository.save(account);
-            logger.info("Account {} added successfully", accountDB);
-            return accountDB;
+        } else {
+            Account accountDB = accountRepository.save(accountIMapper.accountPostDtoToAccount(accountPostDto));
+            AccountGetDto accountGetDto = accountIMapper.accountToAccountGetDto(accountDB);
+            logger.info("Account: {} added successfully", accountGetDto);
+            return accountGetDto;
         }
     }
 
     @Transactional
-    public void deleteAccount(Integer id){
-        logger.debug("In AccountService deleteAccount()");
-        if(accountRepository.existsById(id)){
+    public void deleteAccount(Integer id) {
+        logger.debug("In AccountService deleteAccount() id: {}", id);
+        Account account = accountRepository
+                .findById(id)
+                .orElseThrow(() -> {
+                    DataNotFoundException exception = new DataNotFoundException(String.format("Cannot delete account with id: %d because this not exist in database", id));
+                    logger.error("Exception occured in deleteAccount() id: {} ", id, exception);
+                    throw exception;
+                });
+        if(employeeRepository.existsByAccountEmployee(account)){
+            DataRelationException exception = new DataRelationException(String.format("Delete failed! First you need to detach Employee from this Account id: %d", id));
+            logger.error("Exception occured in deleteAccount() id: {} account not detached", id, exception);
+            throw exception;
+        }
+        else{
             accountRepository.deleteById(id);
-            logger.info("Account id {} deleted successfully", id);
-        }
-        else {
-            DataNotFoundException exception = new DataNotFoundException(String.format("Delete failed! Account with id: %d not exist in database!", id));
-            logger.error("Exception occured in deleteAccount() id: {} ", id, exception);
-            throw exception;
+            logger.info("Account id: {} deleted successfully", id);
         }
     }
 
     @Transactional
-    public Account updateAccount(Account account, Integer id){
-        logger.debug("In AccountService updateAccount()");
+    public AccountGetDto updateAccount(AccountPostDto accountPostDto, Integer id) {
+        logger.debug("In AccountService updateAccount() account: {} id: {}", accountPostDto, id);
+        Account account = accountIMapper.accountPostDtoToAccount(accountPostDto);
         Account accountDB = accountRepository
                 .findById(id)
                 .orElseThrow(() -> {
-                        DataNotFoundException exception = new DataNotFoundException(String.format("Update failed! Account with id: %d not exist in database!", id));
-                        logger.error("Error occured in updateAccount() findById()", exception);
-                        throw exception;
+                    DataNotFoundException exception = new DataNotFoundException(String.format("Update failed! Account with id: %d not exist in database!", id));
+                    logger.error("Error occured in updateAccount() findById() account: {} id: {}", account, id, exception);
+                    throw exception;
                 });
 
         boolean otherAccountWithSameLogin = accountRepository
                 .findByLoginAndIdAccountNot(account.getLogin(), id)
                 .isPresent();
 
-        if(otherAccountWithSameLogin){
+        if (otherAccountWithSameLogin) {
             DataDuplicateException exception = new DataDuplicateException(String.format("Update failed! Account with login: %s already exist in database!", account.getLogin()));
-            logger.error("Error occured in updateAccount() findByLoginAndIdAccountNot()", exception);
+            logger.error("Error occured in updateAccount() findByLoginAndIdAccountNot() account: {} id: {}", accountDB, id, exception);
             throw exception;
-        }
-        else{
+        } else {
             try {
-                accountDB.setLogin(account.getLogin());
-                accountDB.setPassword(account.getPassword());
+                accountIMapper.updateAccountFromAccountPostDto(accountPostDto, accountDB);
                 accountRepository.save(accountDB);
-                logger.info("Account id {} updated successfully", id);
-            }
-            catch(Exception exception){
-                logger.error("Exception occured in updateAccount() id: {} , method set login/password", id, exception);
+                logger.info("Account: {} id {} updated successfully", accountDB, id);
+            } catch (Exception exception) {
+                logger.error("Exception occured in updateAccount() account: {} id: {} , method set login/password", accountDB, id, exception);
             }
         }
-        return accountDB;
+        AccountGetDto accountGetDto = accountIMapper.accountToAccountGetDto(accountDB);
+        return accountGetDto;
     }
 }

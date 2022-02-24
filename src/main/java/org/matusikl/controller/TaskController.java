@@ -5,7 +5,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.matusikl.model.Task;
+import org.matusikl.dto.taskdto.TaskGetDto;
+import org.matusikl.dto.taskdto.TaskPostDto;
 import org.matusikl.service.TaskService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -37,14 +39,14 @@ public class TaskController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found task with specified id",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Task.class))}),
+                            schema = @Schema(implementation = TaskGetDto.class))}),
             @ApiResponse(responseCode = "404", description = "Error: not found in database",
                     content = @Content)})
     @GetMapping(path = "/tasks/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Task> getTask(@PathVariable("id") Integer id){
-        logger.debug("In TaskController getTask()");
-        Task task = taskService.getTask(id);
-        logger.info("Got task from service {}", task);
+    public ResponseEntity<TaskGetDto> getTask(@PathVariable("id") Integer id){
+        logger.debug("In TaskController getTask() id: {}", id);
+        TaskGetDto task = taskService.getTask(id);
+        logger.info("Got task: {} id: {} from service", task, id);
         return ResponseEntity
                 .ok()
                 .body(task);
@@ -54,13 +56,13 @@ public class TaskController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found list of tasks",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Task.class))}),
+                            schema = @Schema(implementation = TaskGetDto.class))}),
             @ApiResponse(responseCode = "404", description = "Error: not found in database",
                     content = @Content)})
     @GetMapping(path = "/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Task>> getTasks(){
+    public ResponseEntity<List<TaskGetDto>> getTasks(){
         logger.debug("In TaskController getTasks()");
-        List<Task> taskList = taskService.getTasks();
+        List<TaskGetDto> taskList = taskService.getTasks();
         logger.info("Got list of tasks from service");
         return ResponseEntity
                 .ok()
@@ -71,14 +73,14 @@ public class TaskController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Saved specified task",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Task.class))}),
+                            schema = @Schema(implementation = TaskGetDto.class))}),
             @ApiResponse(responseCode = "400", description = "Error: validation of attributes",
                     content = @Content)})
     @PostMapping(path = "/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Task> addTask(@Valid @RequestBody Task task){
-        logger.debug("In TaskController addTask()");
-        Task addedTask = taskService.addTask(task);
-        logger.info("Added task from service {}", addedTask);
+    public ResponseEntity<TaskGetDto> addTask(@Valid @RequestBody TaskPostDto task){
+        logger.debug("In TaskController addTask() task: {}", task);
+        TaskGetDto addedTask = taskService.addTask(task);
+        logger.info("Added task: {} from service", addedTask);
         return ResponseEntity
                 .ok()
                 .body(addedTask);
@@ -87,15 +89,14 @@ public class TaskController {
     @Operation(summary = "Delete task", description = "Delete task with specified id", tags = "Task")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Deleted task with specified id",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Task.class))}),
+                    content = {@Content(mediaType = "application/json")}),
             @ApiResponse(responseCode = "404", description = "Error: not found in database",
                     content = @Content)})
     @DeleteMapping(path = "/tasks/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity<String> deleteTask(@PathVariable ("id") Integer id){
-        logger.debug("In TaskController deleteTask()");
+        logger.debug("In TaskController deleteTask() id: {}", id);
         taskService.deleteTask(id);
-        logger.info("Deleted task id {} from service", id);
+        logger.info("Deleted task id: {} from service", id);
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.TEXT_PLAIN)
@@ -106,19 +107,38 @@ public class TaskController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Updated task with specified id",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Task.class))}),
+                            schema = @Schema(implementation = TaskGetDto.class))}),
             @ApiResponse(responseCode = "404", description = "Error: not found in database",
                     content = @Content),
             @ApiResponse(responseCode = "400", description = "Error: validation of attributes",
                     content = @Content)})
     @PutMapping(value = "/tasks/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Task> updateTask(@PathVariable ("id") Integer id,
-                                           @Valid @RequestBody Task task){
-        logger.debug("In TaskController updateTask()");
-        Task updatedTask = taskService.updateTask(id, task);
-        logger.info("Updated task {} id {} from service", updatedTask, id);
+    public ResponseEntity<TaskGetDto> updateTask(@PathVariable ("id") Integer id,
+                                           @Valid @RequestBody TaskPostDto task){
+        logger.debug("In TaskController updateTask() id: {} task: {}", id, task);
+        TaskGetDto updatedTask = taskService.updateTask(id, task);
+        logger.info("Updated task: {} id: {} from service", updatedTask, id);
         return ResponseEntity
                 .ok()
                 .body(updatedTask);
+    }
+
+    @Operation(summary = "Assign employee to task", description = "Assign employee with specified id to task with specified id", tags = "Task")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Assigned employee id to task id",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TaskGetDto.class))}),
+            @ApiResponse(responseCode = "404", description = "Error: Employee/Task not found in database",
+                    content = @Content)
+    })
+    @PatchMapping(path = "/tasks/{idTask}/employees/{idEmp}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<TaskGetDto> assignEmployeeToTask(@PathVariable ("idTask") Integer idTask,
+                                                        @PathVariable ("idEmp") Integer idEmp){
+        logger.debug("In TaskController assignEmployeeToTask() idTask: {} idEmp: {}", idTask, idEmp);
+        TaskGetDto task = taskService.assignEmployeeToTask(idTask, idEmp);
+        logger.info("Updated task! Assigned Employee id: {} to Task id: {}", idEmp, idTask);
+        return ResponseEntity
+                .ok()
+                .body(task);
     }
 }

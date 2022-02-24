@@ -7,9 +7,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Column;
 import javax.persistence.GenerationType;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Entity
@@ -21,12 +18,8 @@ public class Account implements Serializable {
     @Column(name = "idAccount")
     private Integer idAccount;
 
-    @NotNull(message = "{account.login.null}")
-    @Pattern(message = "{account.login.pattern}",
-            regexp = "[a-zA-Z0-9]{8,}$")
     private String login;
 
-    @Size(min = 8, message = "{account.password.size}")
     private String password;
 
     public Account() {
@@ -47,10 +40,8 @@ public class Account implements Serializable {
         return decryptedPassword;
     }
 
-    public void setPassword(String password) throws Exception {
-        EncryptionPassword encryptionPassword = new EncryptionPassword();
-        String encryptedPassword = encryptionPassword.encrypt(password);
-        this.password = encryptedPassword;
+    public void setPassword(String password){
+        this.password = password;
     }
 
     public Integer getIdAccount() {

@@ -5,7 +5,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.matusikl.model.Account;
+import org.matusikl.dto.accountdto.AccountGetDto;
+import org.matusikl.dto.accountdto.AccountPostDto;
 import org.matusikl.service.AccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,14 +37,14 @@ public class AccountController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Found the Account with specified id",
             content = {@Content(mediaType = "application/json",
-            schema = @Schema(implementation = Account.class))}),
+            schema = @Schema(implementation = AccountGetDto.class))}),
         @ApiResponse(responseCode = "404", description = "Error: not found in database",
             content = @Content)})
     @GetMapping(path = "/accounts/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Account> getAccount(@PathVariable ("id") Integer id){
-        logger.debug("In AccountController getAccount()");
-        Account account = accountService.getAccount(id);
-        logger.info("Got account from service {}", account);
+    public ResponseEntity<AccountGetDto> getAccount(@PathVariable ("id") Integer id){
+        logger.debug("In AccountController getAccount() id: {}", id);
+        AccountGetDto account = accountService.getAccount(id);
+        logger.info("Got account: {} id: {} from service", account, id);
         return ResponseEntity
             .ok()
             .body(account);
@@ -53,16 +54,16 @@ public class AccountController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Account saved in database",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Account.class))}),
+                            schema = @Schema(implementation = AccountGetDto.class))}),
             @ApiResponse(responseCode = "400", description = "Error: validation of attributes",
                     content = @Content),
             @ApiResponse(responseCode = "409", description = "Error: duplicate - data already exist in database",
             content = @Content)})
     @PostMapping(path = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Account> addAcount(@Valid @RequestBody Account account){
-        logger.debug("In AccountController addAccount()");
-        Account addedAccount = accountService.addAccount(account);
-        logger.info("Added account from service {}", addedAccount);
+    public ResponseEntity<AccountGetDto> addAcount(@Valid @RequestBody AccountPostDto account){
+        logger.debug("In AccountController addAccount() account: {}", account);
+        AccountGetDto addedAccount = accountService.addAccount(account);
+        logger.info("Added account: {} from service", addedAccount);
         return ResponseEntity
                 .ok()
                 .body(addedAccount);
@@ -71,13 +72,12 @@ public class AccountController {
     @Operation(summary = "Delete account", description = "Delete account by specified id", tags = "Account")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Account with specified id deleted from database",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Account.class))}),
+                    content = {@Content(mediaType = "application/json")}),
             @ApiResponse(responseCode = "404", description = "Error: not found in database",
                     content = @Content)})
     @DeleteMapping(path = "/accounts/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> deleteAccount(@PathVariable ("id") Integer id){
-        logger.debug("In AccountController deleteAccount()");
+        logger.debug("In AccountController deleteAccount() id: {}", id);
         accountService.deleteAccount(id);
         logger.info("Deleted account id {} from service", id);
         return ResponseEntity
@@ -90,7 +90,7 @@ public class AccountController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Updated account with specified id in database",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Account.class))}),
+                            schema = @Schema(implementation = AccountGetDto.class))}),
             @ApiResponse(responseCode = "404", description = "Error: not found in database",
                     content = @Content),
             @ApiResponse(responseCode = "409", description = "Error: duplicate - data already exist in database",
@@ -98,11 +98,11 @@ public class AccountController {
             @ApiResponse(responseCode = "400", description = "Error: validation of attributes",
                     content = @Content)})
     @PutMapping(path = "/accounts/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Account> updateAccount(@PathVariable ("id") Integer id,
-                                                 @Valid @RequestBody Account account) {
-        logger.debug("In AccountController updateAccount()");
-        Account updatedAccount = accountService.updateAccount(account, id);
-        logger.info("Updated account {} id {} from service", updatedAccount, id);
+    public ResponseEntity<AccountGetDto> updateAccount(@PathVariable ("id") Integer id,
+                                                 @Valid @RequestBody AccountPostDto account) {
+        logger.debug("In AccountController updateAccount() id: {} account: {}", id, account);
+        AccountGetDto updatedAccount = accountService.updateAccount(account, id);
+        logger.info("Updated account: {} id: {} from service", updatedAccount, id);
         return ResponseEntity
                 .ok()
                 .body(updatedAccount);

@@ -1,9 +1,21 @@
 package org.matusikl.service;
 
+import org.matusikl.dto.employeedto.EmployeeAccountDto;
+import org.matusikl.dto.employeedto.EmployeeGetDto;
+import org.matusikl.dto.employeedto.EmployeeJobDto;
+import org.matusikl.dto.employeedto.EmployeeLaptopDto;
+import org.matusikl.dto.employeedto.EmployeePostDto;
 import org.matusikl.exception.DataDuplicateException;
 import org.matusikl.exception.DataNotFoundException;
+import org.matusikl.model.Account;
 import org.matusikl.model.Employee;
+import org.matusikl.mapperinterface.EmployeeIMapper;
+import org.matusikl.model.Job;
+import org.matusikl.model.Laptop;
+import org.matusikl.repository.AccountRepository;
 import org.matusikl.repository.EmployeeRepository;
+import org.matusikl.repository.JobRepository;
+import org.matusikl.repository.LaptopRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +27,27 @@ import java.util.List;
 public class EmployeeService {
 
     EmployeeRepository employeeRepository;
+    AccountRepository accountRepository;
+    LaptopRepository laptopRepository;
+    JobRepository jobRepository;
+    EmployeeIMapper employeeIMapper;
     private Logger logger = LoggerFactory.getLogger(EmployeeService.class);
 
     @Autowired
-    public EmployeeService(EmployeeRepository employeeRepository){
+    public EmployeeService(EmployeeRepository employeeRepository,
+                           AccountRepository accountRepository,
+                           LaptopRepository laptopRepository,
+                           JobRepository jobRepository,
+                           EmployeeIMapper employeeIMapper){
         this.employeeRepository = employeeRepository;
+        this.accountRepository = accountRepository;
+        this.laptopRepository = laptopRepository;
+        this.jobRepository = jobRepository;
+        this.employeeIMapper = employeeIMapper;
     }
 
-    public Employee getEmployee(Integer id){
-        logger.debug("In EmployeeService getEmployee() method");
+    public EmployeeGetDto getEmployee(Integer id){
+        logger.debug("In EmployeeService getEmployee() method id: {}", id);
         Employee employee = employeeRepository
                 .findById(id)
                 .orElseThrow(() -> {
@@ -31,11 +55,12 @@ public class EmployeeService {
                         logger.error("Exception occured in getEmployee() id: {}", id, exception);
                         throw exception;
                 });
-        logger.info("Found employee with id {}", id);
-        return employee;
+        logger.info("Found employee: {} with id {}", employee, id);
+        EmployeeGetDto employeeDto = employeeIMapper.employeeToEmployeeGetDto(employee);
+        return employeeDto;
     }
 
-    public List<Employee> getEmployees(){
+    public List<EmployeeGetDto> getEmployees(){
         logger.debug("In EmployeeService getEmployees() method");
         List<Employee> employeeList = employeeRepository.findAll();
         if(employeeList.isEmpty()){
@@ -45,42 +70,45 @@ public class EmployeeService {
         }
         else{
             logger.info("Found list of employees");
-            return employeeList;
+            List<EmployeeGetDto> employeeGetDtoList = employeeIMapper.listEmployeeToListEmployeeGetDto(employeeList);
+            return employeeGetDtoList;
         }
     }
 
     @Transactional
-    public Employee addEmployee(Employee employee){
-        logger.debug("In EmployeeService addEmployee() method");
+    public EmployeeGetDto addEmployee(EmployeePostDto employeePostDto){
+        logger.debug("In EmployeeService addEmployee() method employee: {}", employeePostDto);
+        Employee employee = employeeIMapper.employeePostDtoToEmployee(employeePostDto);
         boolean existEmployeeByPID = employeeRepository
-                .findByPersonalIdentityNumberEmployee(employee.getPersonalIdentityNumberEmployee())
-                .isPresent();
+                .existsByPersonalIdentityNumberEmployee(employee.getPersonalIdentityNumberEmployee());
+
         boolean existEmployeeByEmail = employeeRepository
-                .findByEmailEmployee(employee.getEmailEmployee())
-                .isPresent();
+                .existsByEmailEmployee(employee.getEmailEmployee());
+
         if(existEmployeeByPID){
             DataDuplicateException exception = new DataDuplicateException(String.format("Add employee failed! Employee with given personal identify number already exist"));
-            logger.error("Exception occured in addEmployee() findByPersonalIdentityNumberEmployee(): {}", exception);
+            logger.error("Exception occured in addEmployee() findByPersonalIdentityNumberEmployee() employee: {}", employee, exception);
             throw exception;
         }
         else if(existEmployeeByEmail){
             DataDuplicateException exception = new DataDuplicateException(String.format("Add employee failed! Employee with given email already exist"));
-            logger.error("Exception occured in addEmployee() findByEmailEmployee(): {}", exception);
+            logger.error("Exception occured in addEmployee() findByEmailEmployee() employee: {}", employee, exception);
             throw exception;
         }
         else{
             Employee employeeDB = employeeRepository.save(employee);
-            logger.info("Employee {} added successfully", employeeDB);
-            return employeeDB;
+            logger.info("Employee: {} added successfully", employeeDB);
+            EmployeeGetDto employeeGetDto = employeeIMapper.employeeToEmployeeGetDto(employeeDB);
+            return employeeGetDto;
         }
     }
 
     @Transactional
     public void deleteEmployee(Integer id){
-        logger.debug("In EmployeeService deleteEmployee() method");
+        logger.debug("In EmployeeService deleteEmployee() method id: {}", id);
         if(employeeRepository.existsById(id)){
             employeeRepository.deleteById(id);
-            logger.info("Employee id {} deleted successfully", id);
+            logger.info("Employee id: {} deleted successfully", id);
         }
         else{
             DataNotFoundException exception = new DataNotFoundException(String.format("Delete employee failed! There is no employee with id: %d in database", id));
@@ -90,51 +118,134 @@ public class EmployeeService {
     }
 
     @Transactional
-    public Employee updateEmployee(Integer id, Employee employee){
-        logger.debug("In EmployeeService updateEmployee() method");
+    public EmployeeGetDto updateEmployee(Integer id, EmployeePostDto employeePostDto){
+        logger.debug("In EmployeeService updateEmployee() method id: {} employee: {}", id, employeePostDto);
+        Employee employee = employeeIMapper.employeePostDtoToEmployee(employeePostDto);
         Employee employeeDB = employeeRepository
                 .findById(id)
                 .orElseThrow(() -> {
                         DataNotFoundException exception = new DataNotFoundException(String.format("Update employee failed! There is no employee with id: %d in database", id));
-                        logger.error("Error occured in updateEmployee() findById()", exception);
+                        logger.error("Error occured in updateEmployee() findById() id: {} employee: {}", id, employee, exception);
                         throw exception;
                 });
 
         boolean otherEmployeeWithSameIdentifyNumber = employeeRepository
-                .findByPersonalIdentityNumberEmployeeWithOtherID(employee.getPersonalIdentityNumberEmployee(), id)
-                .isPresent();
+                .existsByPersonalIdentityNumberEmployeeAndIdEmployeeNot(employee.getPersonalIdentityNumberEmployee(), id);
 
         boolean otherEmployeeWithSameEmail = employeeRepository
-                .findByEmailWithOtherID(employee.getEmailEmployee(), id)
-                .isPresent();
+                .existsByEmailEmployeeAndIdEmployeeNot(employee.getEmailEmployee(), id);
 
         if(otherEmployeeWithSameIdentifyNumber){
             DataDuplicateException exception = new DataDuplicateException(String.format("Update employee failed! There is already employee with given personal id number"));
-            logger.error("Error occured in updateEmployee() findByPersonalIdentityNumberEmployeeWithOtherID()", exception);
+            logger.error("Error occured in updateEmployee() findByPersonalIdentityNumberEmployeeWithOtherID() id: {} employee: {}", id, employeeDB, exception);
             throw exception;
         }
         else if(otherEmployeeWithSameEmail){
             DataDuplicateException exception = new DataDuplicateException(String.format("Update employee failed! There is already employee with given email"));
-            logger.error("Error occured in updateEmployee() findByEmailWithOtherID()", exception);
+            logger.error("Error occured in updateEmployee() findByEmailWithOtherID() id: {} employee: {}", id, employeeDB, exception);
             throw exception;
         }
         else{
-            employeeDB.setNameEmployee(employee.getNameEmployee());
-            employeeDB.setSurnameEmployee(employee.getSurnameEmployee());
-            employeeDB.setEmailEmployee(employee.getEmailEmployee());
-            employeeDB.setSalaryEmployee(employee.getSalaryEmployee());
-            employeeDB.setBirthdayEmployee(employee.getBirthdayEmployee());
-            employeeDB.setDismissalDateEmployee(employee.getDismissalDateEmployee());
-            employeeDB.setEmploymentDateEmployee(employee.getEmploymentDateEmployee());
-            employeeDB.setJob(employee.getJob());
-            employeeDB.setRoleEmployeeList(employee.getRoleEmployeeList());
-            employeeDB.setLaptopEmployee(employee.getLaptopEmployee());
-            employeeDB.setTaskList(employee.getTaskList());
-            employeeDB.setPersonalIdentityNumberEmployee(employee.getPersonalIdentityNumberEmployee());
-            employeeDB.setAccountEmployee(employee.getAccountEmployee());
+            employeeIMapper.updateEmployeeFromEmployeePostDto(employeePostDto, employeeDB);
             employeeRepository.save(employeeDB);
-            logger.info("Employee id {} updated successfully", id);
-            return employeeDB;
+            logger.info("Employee: {} id: {} updated successfully", employeeDB, id);
+            EmployeeGetDto employeeGetDto = employeeIMapper.employeeToEmployeeGetDto(employeeDB);
+            return employeeGetDto;
         }
+    }
+
+    @Transactional
+    public EmployeeAccountDto assignAccountToEmployee(Integer idEmp, Integer idAcc){
+        logger.debug("In EmployeeService assignAccountToEmployee() method idEmp: {} idAcc: {}", idEmp, idAcc);
+        Employee employee = employeeRepository
+                .findById(idEmp)
+                .orElseThrow(() -> {
+                        DataNotFoundException exception = new DataNotFoundException(String.format("Assign failed! There is no employee in database with id: %s",idEmp));
+                        logger.error("Error occured in EmployeeService assignAccountToEmployee() idEmp: {} idAcc: {}", idEmp, idAcc, exception);
+                        throw exception;
+                });
+        Account account = accountRepository
+                .findById(idAcc)
+                .orElseThrow(() -> {
+                        DataNotFoundException exception = new DataNotFoundException(String.format("Assign failed! There is no account in database with id: %s", idAcc));
+                        logger.error("Error occured in EmployeeService assignAccountToEmployee() idEmp: {} idAcc: {}", idEmp, idAcc, exception);
+                        throw exception;
+        });
+
+        boolean accountAssignedToOtherEmployee = employeeRepository
+                .existsByAccountEmployee(account);
+
+        if(accountAssignedToOtherEmployee){
+            DataDuplicateException exception = new DataDuplicateException("Assign failed! This account is already assigned to other employee in database");
+            logger.error("Error occured in EmployeeController assignAccountToEmployee(): Account: {} idAcc: {} already assigned to other employee!", account, idAcc, exception);
+            throw exception;
+        }
+        else{
+            employee.setAccountEmployee(account);
+            employeeRepository.save(employee);
+            logger.info("Account: {} idAcc: {} saved to Employee: {} idEmp: {} successfully", account, idAcc, employee, idEmp);
+            EmployeeAccountDto employeeAccountDto = employeeIMapper.employeeToEmployeeAccountDto(employee);
+            return employeeAccountDto;
+        }
+    }
+
+    @Transactional
+    public EmployeeLaptopDto assignLaptopToEmployee(Integer idEmp, Integer idLap){
+        logger.debug("In EmployeeService assignLaptopToEmployee() method idEmp: {} idLap: {}", idEmp, idLap);
+        Employee employee = employeeRepository
+                .findById(idEmp)
+                .orElseThrow(() -> {
+                    DataNotFoundException exception = new DataNotFoundException(String.format("Assign failed! There is no employee in database with id: %s",idEmp));
+                    logger.error("Error occured in EmployeeService assignLaptopToEmployee() idEmp: {}, idLap: {}", idEmp, idLap, exception);
+                    throw exception;
+                });
+        Laptop laptop = laptopRepository
+                .findById(idLap)
+                .orElseThrow(() -> {
+                    DataNotFoundException exception = new DataNotFoundException(String.format("Assign failed! There is no laptop in database with id: %s", idLap));
+                    logger.error("Error occured in EmployeeService assignLaptopToEmployee() idEmp: {} idLap: {}", idEmp, idLap, exception);
+                    throw exception;
+                });
+
+        boolean laptopAssignedToOtherEmployee = employeeRepository
+                .existsByLaptopEmployee(laptop);
+
+        if(laptopAssignedToOtherEmployee){
+            DataDuplicateException exception = new DataDuplicateException("Assign failed! This laptop is already assigned to other employee in database");
+            logger.error("Error occured in EmployeeController assignLaptopToEmployee(): Laptop: {} idLap: {} already assigned to other employee!", laptop, idLap, exception);
+            throw exception;
+        }
+        else{
+            employee.setLaptopEmployee(laptop);
+            employeeRepository.save(employee);
+            logger.info("Laptop: {} idLap: {} saved to Employee: {} idEmp: {} successfully", laptop, idLap, employee, idEmp);
+            EmployeeLaptopDto employeeLaptopDto = employeeIMapper.employeeToEmployeeLaptopDto(employee);
+            return employeeLaptopDto;
+        }
+    }
+
+    @Transactional
+    public EmployeeJobDto assignJobToEmployee(Integer idEmp, Integer idJob){
+        logger.debug("In EmployeeService assignJobToEmployee() method idEmp: {} idJob: {}", idEmp, idJob);
+        Employee employee = employeeRepository
+                .findById(idEmp)
+                .orElseThrow(() -> {
+                    DataNotFoundException exception = new DataNotFoundException(String.format("Assign failed! There is no employee in database with id: %s",idEmp));
+                    logger.error("Error occured in EmployeeService assignJobToEmployee() idEmp: {} idJob: {}", idEmp, idJob, exception);
+                    throw exception;
+                });
+        Job job = jobRepository
+                .findById(idJob)
+                .orElseThrow(() -> {
+                    DataNotFoundException exception = new DataNotFoundException(String.format("Assign failed! There is no job in database with id: %s", idJob));
+                    logger.error("Error occured in EmployeeService assignJobToEmployee() idEmp: {} idJob: {}", idEmp, idJob, exception);
+                    throw exception;
+                });
+
+        employee.setJob(job);
+        employeeRepository.save(employee);
+        logger.info("Job: {} idJob: {} saved to Employee: {} idEmp: {} successfully", job, idJob, employee, idEmp);
+        EmployeeJobDto employeeJobDto = employeeIMapper.employeeToEmployeeJobDto(employee);
+        return employeeJobDto;
     }
 }
