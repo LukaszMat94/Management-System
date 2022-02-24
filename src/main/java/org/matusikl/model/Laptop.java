@@ -12,9 +12,6 @@ import javax.persistence.NamedSubgraph;
 import javax.persistence.NamedEntityGraph;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Entity
@@ -38,21 +35,16 @@ public class Laptop implements Serializable {
     @Column(name = "idLaptop")
     private Integer idLaptop;
 
-    @Size(min = 4, max = 20, message = "{laptop.namelaptop.size}")
     @Column(name = "nameLaptop")
     private String nameLaptop;
 
-    @NotEmpty(message = "{laptop.brandLaptop.empty}")
     @Column(name = "brandLaptop")
     private String brandLaptop;
 
     @Column(name = "loginLaptop")
-    @Pattern(message = "{laptop.login.pattern}",
-            regexp = "[a-zA-Z0-9]{8,}$")
     private String loginLaptop;
 
     @Column(name = "passwordLaptop")
-    @Size(min = 8, message = "{laptop.passwordLaptop.size}")
     private String passwordLaptop;
 
     @OneToOne(mappedBy = "laptopEmployee")
@@ -110,10 +102,8 @@ public class Laptop implements Serializable {
 
     }
 
-    public void setPasswordLaptop(String passwordLaptop) throws Exception {
-        EncryptionPassword encryptionPassword = new EncryptionPassword();
-        String encryptedPassword = encryptionPassword.encrypt(passwordLaptop);
-        this.passwordLaptop = encryptedPassword;
+    public void setPasswordLaptop(String passwordLaptop){
+        this.passwordLaptop = passwordLaptop;
     }
 
     public Employee getEmployee() {
