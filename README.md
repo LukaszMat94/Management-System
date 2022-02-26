@@ -19,6 +19,7 @@ Still in progress with incoming updates (new features, develop system, remove de
 	
 ## Technologies/Tools
 Project is created with:
+
 * Java: 8
 * Spring WebMvc: 5.2.18.RELEASE
 * Spring Data JPA: 2.3.9.RELEASE
@@ -33,6 +34,7 @@ Project is created with:
 * MapStruct: 1.4.2.Final
 
 Additional tools:
+
 * IntelliJ IDEA 2021
 * Microsoft SQL Server Management Studio 2018
 * Apache Maven 3.8.2
