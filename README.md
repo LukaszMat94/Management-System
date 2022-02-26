@@ -52,12 +52,12 @@ Before run this project, make sure that:
 1. url, database, username and password is correctly setted in liquibase properties/datasource bean config:
 
     a) liquibase properties
-      * url=jdbc:sqlserver://your_sql_url;databaseName=your_database_name
+      * url=jdbc:sqlserver://your_sql_url;databaseName=Management System
       * username=your_username
       * password=your_password
   
     b) the same scheme of work in datasource bean config:
-      * dataSource.setUrl("jdbc:sqlserver://your_sql_url;databaseName=your_database_name");
+      * dataSource.setUrl("jdbc:sqlserver://your_sql_url;databaseName=Management System");
       * dataSource.setUsername("your_username");
       * dataSource.setPassword("your_password");
 
@@ -73,32 +73,11 @@ $ mvn liquibase:update
 
 ## Performance of Application
 
-### Get operation
-![Get operation](/assets/images/get.jpg)
-
 ### Post operation
 ![Post operation](/assets/images/post.jpg)
 
-### Delete operation
-![Delete operation](/assets/images/delete.jpg)
-
-### Put operation
-![Put operation](/assets/images/put.jpg)
-
-### Patch operation
-![Patch operation](/assets/images/patch.jpg)
-
 ### Exception handling - data not found
 ![Exception datanotfound](/assets/images/datanotfound.jpg)
-
-### Exception handling - duplicate data
-![Exception duplicate](/assets/images/duplicate.jpg)
-
-### Exception handling - data already linked
-![Exception linked](/assets/images/linked.jpg)
-
-### Validation data - identity number size
-![Validation identity number](/assets/images/identity.jpg)
 
 ### Validation data - login pattern
 ![Valdation login pattern](/assets/images/login.jpg)
