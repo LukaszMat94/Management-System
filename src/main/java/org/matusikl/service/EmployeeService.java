@@ -5,6 +5,8 @@ import org.matusikl.dto.employeedto.EmployeeGetDto;
 import org.matusikl.dto.employeedto.EmployeeJobDto;
 import org.matusikl.dto.employeedto.EmployeeLaptopDto;
 import org.matusikl.dto.employeedto.EmployeePostDto;
+import org.matusikl.dto.employeedto.EmployeeRoleDto;
+import org.matusikl.dto.employeedto.EmployeeTaskDto;
 import org.matusikl.exception.DataDuplicateException;
 import org.matusikl.exception.DataNotFoundException;
 import org.matusikl.model.Account;
@@ -12,10 +14,14 @@ import org.matusikl.model.Employee;
 import org.matusikl.mapperinterface.EmployeeIMapper;
 import org.matusikl.model.Job;
 import org.matusikl.model.Laptop;
+import org.matusikl.model.Role;
+import org.matusikl.model.Task;
 import org.matusikl.repository.AccountRepository;
 import org.matusikl.repository.EmployeeRepository;
 import org.matusikl.repository.JobRepository;
 import org.matusikl.repository.LaptopRepository;
+import org.matusikl.repository.RoleRepository;
+import org.matusikl.repository.TaskRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +36,8 @@ public class EmployeeService {
     AccountRepository accountRepository;
     LaptopRepository laptopRepository;
     JobRepository jobRepository;
+    TaskRepository taskRepository;
+    RoleRepository roleRepository;
     EmployeeIMapper employeeIMapper;
     private Logger logger = LoggerFactory.getLogger(EmployeeService.class);
 
@@ -38,11 +46,15 @@ public class EmployeeService {
                            AccountRepository accountRepository,
                            LaptopRepository laptopRepository,
                            JobRepository jobRepository,
+                           TaskRepository taskRepository,
+                           RoleRepository roleRepository,
                            EmployeeIMapper employeeIMapper){
         this.employeeRepository = employeeRepository;
         this.accountRepository = accountRepository;
         this.laptopRepository = laptopRepository;
         this.jobRepository = jobRepository;
+        this.taskRepository = taskRepository;
+        this.roleRepository = roleRepository;
         this.employeeIMapper = employeeIMapper;
     }
 
@@ -76,7 +88,7 @@ public class EmployeeService {
     }
 
     @Transactional
-    public EmployeeGetDto addEmployee(EmployeePostDto employeePostDto){
+    public EmployeePostDto addEmployee(EmployeePostDto employeePostDto){
         logger.debug("In EmployeeService addEmployee() method employee: {}", employeePostDto);
         Employee employee = employeeIMapper.employeePostDtoToEmployee(employeePostDto);
         boolean existEmployeeByPID = employeeRepository
@@ -98,8 +110,8 @@ public class EmployeeService {
         else{
             Employee employeeDB = employeeRepository.save(employee);
             logger.info("Employee: {} added successfully", employeeDB);
-            EmployeeGetDto employeeGetDto = employeeIMapper.employeeToEmployeeGetDto(employeeDB);
-            return employeeGetDto;
+            employeePostDto = employeeIMapper.employeeToEmployeePostDto(employeeDB);
+            return employeePostDto;
         }
     }
 
@@ -247,5 +259,62 @@ public class EmployeeService {
         logger.info("Job: {} idJob: {} saved to Employee: {} idEmp: {} successfully", job, idJob, employee, idEmp);
         EmployeeJobDto employeeJobDto = employeeIMapper.employeeToEmployeeJobDto(employee);
         return employeeJobDto;
+    }
+
+    @Transactional
+    public EmployeeTaskDto assignTaskToEmployee(Integer idTask, Integer idEmp){
+        logger.debug("In EmployeeService assignTaskToEmployee() method idTask: {} idEmp: {}", idTask, idEmp);
+        Task task = taskRepository
+                .findById(idTask)
+                .orElseThrow(() -> {
+                    DataNotFoundException exception = new DataNotFoundException(String.format("Assign failed! There is no task in database with id: %s", idTask));
+                    logger.error("Error occured in EmployeeService assignTaskToEmployee() idTask: {} idEmp: {}", idTask, idEmp, exception);
+                    throw exception;
+                });
+        Employee employee = employeeRepository
+                .findById(idEmp)
+                .orElseThrow(() -> {
+                    DataNotFoundException exception = new DataNotFoundException(String.format("Assign failed! There is no employee in database with id: %s",idEmp));
+                    logger.error("Error occured in EmployeeService assignTaskToEmployee() idTask: {} idEmp: {}", idTask, idEmp, exception);
+                    throw exception;
+                });
+
+        employee.getTaskList().add(task);
+        employeeRepository.save(employee);
+        logger.info("Task: {} idTask: {} saved to Employee: {} idEmp: {} successfully", task, idTask, employee, idEmp);
+        EmployeeTaskDto employeeTaskDto = employeeIMapper.employeeToEmployeeTaskDto(employee);
+        return employeeTaskDto;
+    }
+
+    @Transactional
+    public EmployeeRoleDto assignRoleToEmployee(Integer idRole, Integer idEmp){
+        logger.debug("In EmployeeService assignRoleToEmployee() method idEmp: {} idRole: {}", idEmp, idRole);
+        Employee employee = employeeRepository
+                .findById(idEmp)
+                .orElseThrow(() -> {
+                    DataNotFoundException exception = new DataNotFoundException(String.format("Assign failed! There is no employee in database with id: %s",idEmp));
+                    logger.error("Error occured in EmployeeService assignRoleToEmployee() idEmp: {}, idLap: {}", idEmp, idRole, exception);
+                    throw exception;
+                });
+        Role role = roleRepository
+                .findById(idRole)
+                .orElseThrow(() -> {
+                    DataNotFoundException exception = new DataNotFoundException(String.format("Assign failed! There is no role in database with id: %s", idRole));
+                    logger.error("Error occured in EmployeeService assignRoleToEmployee() idEmp: {} idRole: {}", idEmp, idRole, exception);
+                    throw exception;
+                });
+
+        for(Role roleExist : employee.getRoleEmployeeList()){
+            if(roleExist.equals(role)){
+                DataDuplicateException exception = new DataDuplicateException("Assign failed! This role is already assigned to employee in database");
+                logger.error("Error occured in EmployeeController assignRoleToEmployee(): Role: {} idRole: {} already assigned to employee!", role, idRole, exception);
+                throw exception;
+            }
+        }
+        employee.getRoleEmployeeList().add(role);
+        employeeRepository.save(employee);
+        logger.info("Role: {} idRole: {} saved to Employee: {} idEmp: {} successfully", role, idRole, employee, idEmp);
+        EmployeeRoleDto employeeRoleDto = employeeIMapper.employeeToEmployeeRoleDto(employee);
+        return employeeRoleDto;
     }
 }

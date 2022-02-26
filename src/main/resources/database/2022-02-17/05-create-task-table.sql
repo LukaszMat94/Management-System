@@ -1,5 +1,8 @@
 --liquibase formatted sql
---changeset lukasz_matusik:5
+--changeset lukasz_matusik:5_create_task_table
+
+USE [Management System]
+GO
 
 SET ANSI_NULLS ON
 GO
@@ -9,10 +12,10 @@ GO
 
 CREATE TABLE [dbo].[MS_Task](
                                 [idTask] [int] IDENTITY(1,1) NOT NULL,
-                                [description] [varchar](255) NULL,
-                                [endDate] [datetime2](7) NULL,
                                 [name] [varchar](255) NULL,
+                                [description] [varchar](255) NULL,
                                 [startDate] [datetime2](7) NULL,
+                                [endDate] [datetime2](7) NULL,
                                 PRIMARY KEY CLUSTERED
                                     (
                                      [idTask] ASC

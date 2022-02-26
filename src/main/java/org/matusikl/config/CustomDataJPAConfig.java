@@ -37,7 +37,7 @@ public class CustomDataJPAConfig {
     public DataSource dataSource(){
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        dataSource.setUrl("jdbc:sqlserver://LucasPC\\SQLEXPRESS;databaseName=New Management System");
+        dataSource.setUrl("jdbc:sqlserver://LucasPC\\SQLEXPRESS;databaseName=Management System");
         dataSource.setUsername("Administrator");
         dataSource.setPassword("admin2");
         return dataSource;

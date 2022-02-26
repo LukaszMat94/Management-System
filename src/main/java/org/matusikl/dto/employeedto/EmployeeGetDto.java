@@ -41,6 +41,7 @@ public class EmployeeGetDto {
     private String emailEmployee;
 
     @JsonManagedReference
+    @JsonIgnoreProperties("employee")
     private LaptopGetDto laptopEmployee;
 
     private List<RoleGetDto> roleEmployeeList;

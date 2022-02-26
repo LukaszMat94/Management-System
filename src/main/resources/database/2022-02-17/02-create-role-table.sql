@@ -1,5 +1,8 @@
 --liquibase formatted sql
---changeset lukasz_matusik:2
+--changeset lukasz_matusik:2_create_role_table
+
+USE [Management System]
+GO
 
 SET ANSI_NULLS ON
 GO

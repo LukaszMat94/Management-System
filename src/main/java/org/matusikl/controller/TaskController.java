@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -121,24 +120,5 @@ public class TaskController {
         return ResponseEntity
                 .ok()
                 .body(updatedTask);
-    }
-
-    @Operation(summary = "Assign employee to task", description = "Assign employee with specified id to task with specified id", tags = "Task")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Assigned employee id to task id",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = TaskGetDto.class))}),
-            @ApiResponse(responseCode = "404", description = "Error: Employee/Task not found in database",
-                    content = @Content)
-    })
-    @PatchMapping(path = "/tasks/{idTask}/employees/{idEmp}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<TaskGetDto> assignEmployeeToTask(@PathVariable ("idTask") Integer idTask,
-                                                        @PathVariable ("idEmp") Integer idEmp){
-        logger.debug("In TaskController assignEmployeeToTask() idTask: {} idEmp: {}", idTask, idEmp);
-        TaskGetDto task = taskService.assignEmployeeToTask(idTask, idEmp);
-        logger.info("Updated task! Assigned Employee id: {} to Task id: {}", idEmp, idTask);
-        return ResponseEntity
-                .ok()
-                .body(task);
     }
 }
