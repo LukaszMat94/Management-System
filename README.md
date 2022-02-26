@@ -43,10 +43,11 @@ Additional tools:
 
 ## Prerequisites
 The necessary prerequisites to run this system:
-	* IntelliJ IDEA 2021 (Java 8 version)
-  * Microsoft SQL Server Management Studio 2018
-  * installed and configured Apache Maven 3.8.2
-  * installed and configured Tomcat 9.0.54
+
+* IntelliJ IDEA 2021 (Java 8 version)
+* Microsoft SQL Server Management Studio 2018
+* installed and configured Apache Maven 3.8.2
+* installed and configured Tomcat 9.0.54
  
 ## Setup
 Before run this project, make sure that:
@@ -99,7 +100,7 @@ This project contains:
 ## Incoming updates
 
 For improvement:
-- Avoid cycle references when using mapstruct(Task <-> Employee) - currently ignored references in DTO objects 
+- Avoid cycle references when using mapstruct (Task <-> Employee) - currently ignored references in DTO objects 
 - Create custom validation for attribute ZoneDateTime - currently no validation
 - Optional: migrate spring/springdoc and others libraries to newer versions
 
