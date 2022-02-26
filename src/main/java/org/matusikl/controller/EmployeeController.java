@@ -10,6 +10,8 @@ import org.matusikl.dto.employeedto.EmployeeGetDto;
 import org.matusikl.dto.employeedto.EmployeeJobDto;
 import org.matusikl.dto.employeedto.EmployeeLaptopDto;
 import org.matusikl.dto.employeedto.EmployeePostDto;
+import org.matusikl.dto.employeedto.EmployeeRoleDto;
+import org.matusikl.dto.employeedto.EmployeeTaskDto;
 import org.matusikl.service.EmployeeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,15 +78,15 @@ public class EmployeeController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Specified employee saved",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = EmployeeGetDto.class))}),
+                            schema = @Schema(implementation = EmployeePostDto.class))}),
             @ApiResponse(responseCode = "400", description = "Error: validation of attributes",
                     content = @Content),
             @ApiResponse(responseCode = "409", description = "Error: duplicate - data already exist in database",
                     content = @Content)})
     @PostMapping(path = "/employees", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeGetDto> addEmployee(@Valid @RequestBody EmployeePostDto employee){
+    public ResponseEntity<EmployeePostDto> addEmployee(@Valid @RequestBody EmployeePostDto employee){
         logger.debug("In EmployeeController addEmployee() employee: {}", employee);
-        EmployeeGetDto addedEmployee = employeeService.addEmployee(employee);
+        EmployeePostDto addedEmployee = employeeService.addEmployee(employee);
         logger.info("Added employee: {} from service", addedEmployee);
         return ResponseEntity
                 .ok()
@@ -186,6 +188,44 @@ public class EmployeeController {
         logger.debug("In EmployeeController assignJobToEmployee() idEmp: {} idJob: {}", idEmp, idJob);
         EmployeeJobDto employee = employeeService.assignJobToEmployee(idEmp, idJob);
         logger.info("Updated employee! Assigned Job id: {} to Employee id: {}", idJob, idEmp);
+        return ResponseEntity
+                .ok()
+                .body(employee);
+    }
+
+    @Operation(summary = "Assign task to employee", description = "Assign task with specified id to employee with specified id", tags = "Employee")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Assigned task id to employee id",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = EmployeeTaskDto.class))}),
+            @ApiResponse(responseCode = "404", description = "Error: Employee/Task not found in database",
+                    content = @Content)
+    })
+    @PatchMapping(path = "/employees/{idEmp}/tasks/{idTask}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EmployeeTaskDto> assignTaskToEmployee(@PathVariable ("idEmp") Integer idEmp,
+                                                                @PathVariable ("idTask") Integer idTask){
+        logger.debug("In EmployeeController assignTaskToEmployee() idTask: {} idEmp: {}", idTask, idEmp);
+        EmployeeTaskDto employee = employeeService.assignTaskToEmployee(idTask, idEmp);
+        logger.info("Updated employee! Assigned Task id: {} to Employee id: {}", idTask, idEmp);
+        return ResponseEntity
+                .ok()
+                .body(employee);
+    }
+
+    @Operation(summary = "Assign role to employee", description = "Assign role with specified id to employee with specified id", tags = "Employee")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Assigned role id to employee id",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = EmployeeRoleDto.class))}),
+            @ApiResponse(responseCode = "404", description = "Error: Employee/Role not found in database",
+                    content = @Content)
+    })
+    @PatchMapping(path = "/employees/{idEmp}/roles/{idRole}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EmployeeRoleDto> assignRoleToEmployee(@PathVariable ("idEmp") Integer idEmp,
+                                                                @PathVariable ("idRole") Integer idRole){
+        logger.debug("In EmployeeController assignRoleToEmployee() idRole: {} idEmp: {}", idRole, idEmp);
+        EmployeeRoleDto employee = employeeService.assignRoleToEmployee(idRole, idEmp);
+        logger.info("Updated employee! Assigned Role id: {} to Employee id: {}", idRole, idEmp);
         return ResponseEntity
                 .ok()
                 .body(employee);

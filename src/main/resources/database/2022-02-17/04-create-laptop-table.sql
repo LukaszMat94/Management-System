@@ -1,5 +1,8 @@
 --liquibase formatted sql
---changeset lukasz_matusik:4
+--changeset lukasz_matusik:4_create_laptop_table
+
+USE [Management System]
+GO
 
 SET ANSI_NULLS ON
 GO
@@ -9,17 +12,17 @@ GO
 
 CREATE TABLE [dbo].[MS_Laptop](
                                   [idLaptop] [int] IDENTITY(1,1) NOT NULL,
+                                  [nameLaptop] [varchar](20) NULL,
                                   [brandLaptop] [varchar](255) NULL,
                                   [loginLaptop] [varchar](255) NULL,
-                                  [nameLaptop] [varchar](20) NULL,
                                   [passwordLaptop] [varchar](255) NULL,
                                   PRIMARY KEY CLUSTERED
                                       (
                                        [idLaptop] ASC
                                           )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
-                                  CONSTRAINT [loginlaptop_constraint_unique] UNIQUE NONCLUSTERED
+                                  CONSTRAINT [namelaptop_constraint_unique] UNIQUE NONCLUSTERED
                                       (
-                                       [loginLaptop] ASC
+                                       [nameLaptop] ASC
                                           )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO

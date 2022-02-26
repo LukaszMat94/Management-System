@@ -4,9 +4,7 @@ import org.matusikl.dto.taskdto.TaskGetDto;
 import org.matusikl.dto.taskdto.TaskPostDto;
 import org.matusikl.exception.DataNotFoundException;
 import org.matusikl.mapperinterface.TaskIMapper;
-import org.matusikl.model.Employee;
 import org.matusikl.model.Task;
-import org.matusikl.repository.EmployeeRepository;
 import org.matusikl.repository.TaskRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,16 +17,13 @@ import java.util.List;
 public class TaskService {
 
     TaskRepository taskRepository;
-    EmployeeRepository employeeRepository;
     TaskIMapper taskIMapper;
     private Logger logger = LoggerFactory.getLogger(TaskService.class);
 
     @Autowired
     public TaskService(TaskRepository taskRepository,
-                       EmployeeRepository employeeRepository,
                        TaskIMapper taskIMapper){
         this.taskRepository = taskRepository;
-        this.employeeRepository = employeeRepository;
         this.taskIMapper = taskIMapper;
     }
 
@@ -102,28 +97,4 @@ public class TaskService {
         return taskGetDto;
     }
 
-    @Transactional
-    public TaskGetDto assignEmployeeToTask(Integer idTask, Integer idEmp){
-        logger.debug("In TaskService assignEmployeeToTask() method idTask: {} idEmp: {}", idTask, idEmp);
-        Task task = taskRepository
-                .findById(idTask)
-                .orElseThrow(() -> {
-                    DataNotFoundException exception = new DataNotFoundException(String.format("Assign failed! There is no task in database with id: %s", idTask));
-                    logger.error("Error occured in TaskService assignEmployeeToTask() idTask: {} idEmp: {}", idTask, idEmp, exception);
-                    throw exception;
-                });
-        Employee employee = employeeRepository
-                .findById(idEmp)
-                .orElseThrow(() -> {
-                    DataNotFoundException exception = new DataNotFoundException(String.format("Assign failed! There is no employee in database with id: %s",idEmp));
-                    logger.error("Error occured in TaskService assignEmployeeToTask() idTask: {} idEmp: {}", idTask, idEmp, exception);
-                    throw exception;
-                });
-
-        task.getEmployeeList().add(employee);
-        taskRepository.save(task);
-        logger.info("Employee: {} idEmp: {} saved to Task: {} idTask: {} successfully", employee, idEmp, task, idTask);
-        TaskGetDto taskGetDto = taskIMapper.taskToTaskGetDto(task);
-        return taskGetDto;
-    }
 }

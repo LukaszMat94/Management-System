@@ -1,5 +1,9 @@
 --liquibase formatted sql
---changeset lukasz_matusik:1
+--changeset lukasz_matusik:1_create_account_table
+
+USE [Management System]
+GO
+
 SET ANSI_NULLS ON
 GO
 
@@ -9,7 +13,6 @@ GO
 CREATE TABLE [dbo].[MS_Account](
                                    [idAccount] [int] IDENTITY(1,1) NOT NULL,
                                    [login] [varchar](255) NOT NULL,
-                                   [login1] [varchar](255) NOT NULL,
                                    [password] [varchar](255) NULL,
                                    PRIMARY KEY CLUSTERED
                                        (
@@ -27,8 +30,4 @@ GO
 
 ALTER TABLE [dbo].[MS_Account] CHECK CONSTRAINT [login_constraint]
 GO
-
-
-
-
 

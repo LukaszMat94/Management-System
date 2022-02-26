@@ -1,5 +1,8 @@
 --liquibase formatted sql
---changeset lukasz_matusik:3
+--changeset lukasz_matusik:3_create_job_table
+
+USE [Management System]
+GO
 
 SET ANSI_NULLS ON
 GO

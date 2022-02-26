@@ -10,6 +10,8 @@ import org.matusikl.dto.employeedto.EmployeeGetDto;
 import org.matusikl.dto.employeedto.EmployeeJobDto;
 import org.matusikl.dto.employeedto.EmployeeLaptopDto;
 import org.matusikl.dto.employeedto.EmployeePostDto;
+import org.matusikl.dto.employeedto.EmployeeRoleDto;
+import org.matusikl.dto.employeedto.EmployeeTaskDto;
 import org.matusikl.dto.taskdto.TaskGetDto;
 import org.matusikl.model.Employee;
 import org.matusikl.model.Task;
@@ -33,6 +35,10 @@ public interface EmployeeIMapper {
     EmployeeLaptopDto employeeToEmployeeLaptopDto(Employee employee);
 
     EmployeeJobDto employeeToEmployeeJobDto(Employee employee);
+
+    EmployeeRoleDto employeeToEmployeeRoleDto(Employee employee);
+
+    EmployeeTaskDto employeeToEmployeeTaskDto(Employee employee);
 
     List<EmployeeGetDto> listEmployeeToListEmployeeGetDto(List<Employee> employee);
 
