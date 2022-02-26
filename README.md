@@ -71,15 +71,15 @@ $ mvn clean install
 $ mvn liquibase:update
 ```
 
-## Performance of Application
+## Performance of Application - examples
 
-### Post operation
+### CRUD example - Post operation
 ![Post operation](/assets/images/post.jpg)
 
-### Exception handling - data not found
+### Exception handling example - data not found
 ![Exception datanotfound](/assets/images/datanotfound.jpg)
 
-### Validation data - login pattern
+### Validation data example - login pattern
 ![Valdation login pattern](/assets/images/login.jpg)
 
 ## What's been done
