@@ -1,5 +1,7 @@
 package org.matusikl.service;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matusikl.dto.accountdto.AccountGetDto;
 import org.matusikl.dto.accountdto.AccountPostDto;
 import org.matusikl.exception.DataDuplicateException;
@@ -9,27 +11,42 @@ import org.matusikl.mapperinterface.AccountIMapper;
 import org.matusikl.model.Account;
 import org.matusikl.repository.AccountRepository;
 import org.matusikl.repository.EmployeeRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.matusikl.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Service
-public class AccountService {
+@Transactional
+public class AccountService implements UserDetailsService{
 
-    AccountRepository accountRepository;
-    EmployeeRepository employeeRepository;
-    AccountIMapper accountIMapper;
-    private Logger logger = LoggerFactory.getLogger(AccountService.class);
+    private final AccountRepository accountRepository;
+    private final EmployeeRepository employeeRepository;
+    private final RoleRepository roleRepository;
+    private final AccountIMapper accountIMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final Logger logger = LogManager.getLogger(AccountService.class);
 
     @Autowired
     public AccountService(AccountRepository accountRepository,
                           EmployeeRepository employeeRepository,
-                          AccountIMapper accountIMapper) {
+                          AccountIMapper accountIMapper,
+                          RoleRepository roleRepository,
+                          @Lazy PasswordEncoder passwordEncoder) {
         this.accountRepository = accountRepository;
         this.employeeRepository = employeeRepository;
         this.accountIMapper = accountIMapper;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public AccountGetDto getAccount(Integer id) {
@@ -57,6 +74,7 @@ public class AccountService {
             logger.error("Exception occured in addAccount() account: {}", accountPostDto, exception);
             throw exception;
         } else {
+            accountPostDto.setPassword(passwordEncoder.encode(accountPostDto.getPassword()));
             Account accountDB = accountRepository.save(accountIMapper.accountPostDtoToAccount(accountPostDto));
             AccountGetDto accountGetDto = accountIMapper.accountToAccountGetDto(accountDB);
             logger.info("Account: {} added successfully", accountGetDto);
@@ -107,6 +125,7 @@ public class AccountService {
             throw exception;
         } else {
             try {
+                accountPostDto.setPassword(passwordEncoder.encode(accountPostDto.getPassword()));
                 accountIMapper.updateAccountFromAccountPostDto(accountPostDto, accountDB);
                 accountRepository.save(accountDB);
                 logger.info("Account: {} id {} updated successfully", accountDB, id);
@@ -116,5 +135,17 @@ public class AccountService {
         }
         AccountGetDto accountGetDto = accountIMapper.accountToAccountGetDto(accountDB);
         return accountGetDto;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Account account = accountRepository
+                .findByLogin(username)
+                .orElseThrow(() -> new DataNotFoundException("Account not exist"));
+        List<String> roleList = roleRepository
+                .findRolesByAccountUsername(username);
+        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        roleList.forEach(role -> authorities.add(new SimpleGrantedAuthority(role)));
+        return new org.springframework.security.core.userdetails.User(account.getLogin(), account.getPassword(), authorities);
     }
 }

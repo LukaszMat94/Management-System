@@ -5,11 +5,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matusikl.dto.roledto.RoleGetDto;
 import org.matusikl.dto.roledto.RolePostDto;
 import org.matusikl.service.RoleService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +26,8 @@ import java.util.List;
 @RestController
 public class RoleController {
 
-    RoleService roleService;
-    private Logger logger = LoggerFactory.getLogger(RoleController.class);
+    private final RoleService roleService;
+    private final Logger logger = LogManager.getLogger(RoleController.class);
 
     @Autowired
     public RoleController(RoleService roleService){

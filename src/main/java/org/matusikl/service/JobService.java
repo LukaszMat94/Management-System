@@ -1,5 +1,7 @@
 package org.matusikl.service;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matusikl.dto.jobdto.JobGetDto;
 import org.matusikl.dto.jobdto.JobPostDto;
 import org.matusikl.exception.DataDuplicateException;
@@ -7,8 +9,6 @@ import org.matusikl.exception.DataNotFoundException;
 import org.matusikl.mapperinterface.JobIMapper;
 import org.matusikl.model.Job;
 import org.matusikl.repository.JobRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,9 +17,9 @@ import java.util.List;
 @Service
 public class JobService {
 
-    JobRepository jobRepository;
-    JobIMapper jobIMapper;
-    private Logger logger = LoggerFactory.getLogger(JobService.class);
+    private final JobRepository jobRepository;
+    private final JobIMapper jobIMapper;
+    private final Logger logger = LogManager.getLogger(JobService.class);
 
     @Autowired
     public JobService(JobRepository jobRepository,

@@ -1,5 +1,7 @@
 package org.matusikl.service;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matusikl.dto.employeedto.EmployeeAccountDto;
 import org.matusikl.dto.employeedto.EmployeeGetDto;
 import org.matusikl.dto.employeedto.EmployeeJobDto;
@@ -22,8 +24,6 @@ import org.matusikl.repository.JobRepository;
 import org.matusikl.repository.LaptopRepository;
 import org.matusikl.repository.RoleRepository;
 import org.matusikl.repository.TaskRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,14 +32,14 @@ import java.util.List;
 @Service
 public class EmployeeService {
 
-    EmployeeRepository employeeRepository;
-    AccountRepository accountRepository;
-    LaptopRepository laptopRepository;
-    JobRepository jobRepository;
-    TaskRepository taskRepository;
-    RoleRepository roleRepository;
-    EmployeeIMapper employeeIMapper;
-    private Logger logger = LoggerFactory.getLogger(EmployeeService.class);
+    private final EmployeeRepository employeeRepository;
+    private final AccountRepository accountRepository;
+    private final LaptopRepository laptopRepository;
+    private final JobRepository jobRepository;
+    private final TaskRepository taskRepository;
+    private final RoleRepository roleRepository;
+    private final EmployeeIMapper employeeIMapper;
+    private final Logger logger = LogManager.getLogger(EmployeeService.class);
 
     @Autowired
     public EmployeeService(EmployeeRepository employeeRepository,

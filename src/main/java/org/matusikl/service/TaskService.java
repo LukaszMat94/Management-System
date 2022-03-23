@@ -1,13 +1,13 @@
 package org.matusikl.service;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matusikl.dto.taskdto.TaskGetDto;
 import org.matusikl.dto.taskdto.TaskPostDto;
 import org.matusikl.exception.DataNotFoundException;
 import org.matusikl.mapperinterface.TaskIMapper;
 import org.matusikl.model.Task;
 import org.matusikl.repository.TaskRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,9 +16,9 @@ import java.util.List;
 @Service
 public class TaskService {
 
-    TaskRepository taskRepository;
-    TaskIMapper taskIMapper;
-    private Logger logger = LoggerFactory.getLogger(TaskService.class);
+    private final TaskRepository taskRepository;
+    private final TaskIMapper taskIMapper;
+    private final Logger logger = LogManager.getLogger(TaskService.class);
 
     @Autowired
     public TaskService(TaskRepository taskRepository,

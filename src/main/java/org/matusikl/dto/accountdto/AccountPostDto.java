@@ -1,6 +1,5 @@
 package org.matusikl.dto.accountdto;
 
-import org.matusikl.encryptionaes256.EncryptionPassword;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -30,9 +29,7 @@ public class AccountPostDto {
         return password;
     }
 
-    public void setPassword(String password) throws Exception {
-        EncryptionPassword encryptionPassword = new EncryptionPassword();
-        String encryptedPassword = encryptionPassword.encrypt(password);
-        this.password = encryptedPassword;
+    public void setPassword(String password){
+        this.password = password;
     }
 }

@@ -1,7 +1,6 @@
 package org.matusikl.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import org.matusikl.encryptionaes256.EncryptionPassword;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -95,11 +94,8 @@ public class Laptop implements Serializable {
         this.loginLaptop = loginLaptop;
     }
 
-    public String getPasswordLaptop() throws Exception {
-        EncryptionPassword encryptionPassword = new EncryptionPassword();
-        String decryptedPassword = encryptionPassword.decrypt(passwordLaptop);
-        return decryptedPassword;
-
+    public String getPasswordLaptop() {
+        return passwordLaptop;
     }
 
     public void setPasswordLaptop(String passwordLaptop){
