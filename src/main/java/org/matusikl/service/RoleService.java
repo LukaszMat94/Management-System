@@ -1,5 +1,7 @@
 package org.matusikl.service;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matusikl.dto.roledto.RoleGetDto;
 import org.matusikl.dto.roledto.RolePostDto;
 import org.matusikl.exception.DataDuplicateException;
@@ -7,8 +9,6 @@ import org.matusikl.exception.DataNotFoundException;
 import org.matusikl.mapperinterface.RoleIMapper;
 import org.matusikl.model.Role;
 import org.matusikl.repository.RoleRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,9 +17,9 @@ import java.util.List;
 @Service
 public class RoleService {
 
-    RoleRepository roleRepository;
-    RoleIMapper roleIMapper;
-    private Logger logger = LoggerFactory.getLogger(RoleService.class);
+    private final RoleRepository roleRepository;
+    private final RoleIMapper roleIMapper;
+    private final Logger logger = LogManager.getLogger(RoleService.class);
 
     @Autowired
     public RoleService(RoleRepository roleRepository,

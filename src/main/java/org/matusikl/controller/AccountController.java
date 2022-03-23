@@ -5,11 +5,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matusikl.dto.accountdto.AccountGetDto;
 import org.matusikl.dto.accountdto.AccountPostDto;
 import org.matusikl.service.AccountService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +25,8 @@ import javax.validation.Valid;
 @RestController
 public class AccountController {
 
-    AccountService accountService;
-    private Logger logger = LoggerFactory.getLogger(AccountController.class);
+    private final AccountService accountService;
+    private final Logger logger = LogManager.getLogger(AccountController.class);
 
     @Autowired
     public AccountController(AccountService accountService){

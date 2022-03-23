@@ -1,5 +1,7 @@
 package org.matusikl.service;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matusikl.dto.laptopdto.LaptopGetDto;
 import org.matusikl.dto.laptopdto.LaptopPostDto;
 import org.matusikl.exception.DataDuplicateException;
@@ -9,27 +11,30 @@ import org.matusikl.mapperinterface.LaptopIMapper;
 import org.matusikl.model.Laptop;
 import org.matusikl.repository.EmployeeRepository;
 import org.matusikl.repository.LaptopRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
 public class LaptopService {
 
-    LaptopRepository laptopRepository;
-    EmployeeRepository employeeRepository;
-    LaptopIMapper laptopIMapper;
-    private Logger logger = LoggerFactory.getLogger(LaptopService.class);
+    private final LaptopRepository laptopRepository;
+    private final EmployeeRepository employeeRepository;
+    private final LaptopIMapper laptopIMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final Logger logger = LogManager.getLogger(LaptopService.class);
 
     @Autowired
     public LaptopService(LaptopRepository laptopRepository,
                          EmployeeRepository employeeRepository,
-                         LaptopIMapper laptopIMapper){
+                         LaptopIMapper laptopIMapper,
+                         @Lazy PasswordEncoder passwordEncoder){
         this.laptopRepository = laptopRepository;
         this.employeeRepository = employeeRepository;
         this.laptopIMapper = laptopIMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public LaptopGetDto getLaptop(Integer id){
@@ -71,6 +76,7 @@ public class LaptopService {
             throw exception;
         }
         else {
+            laptop.setPasswordLaptop(passwordEncoder.encode(laptop.getPasswordLaptop()));
             Laptop laptopDB = laptopRepository.save(laptop);
             logger.info("Laptop: {} added successfully", laptopDB);
             LaptopGetDto laptopGetDto = laptopIMapper.laptopToLaptopGetDto(laptopDB);
@@ -114,6 +120,7 @@ public class LaptopService {
                 .isPresent();
 
         if(!otherLaptopWithSameName){
+            laptopPostDto.setPasswordLaptop(passwordEncoder.encode(laptopPostDto.getPasswordLaptop()));
             laptopIMapper.updateLaptopFromLaptopPostDto(laptopPostDto ,laptopDB);
             laptopRepository.save(laptopDB);
             logger.info("Laptop: {} id: {} updated successfully", laptopDB, id);

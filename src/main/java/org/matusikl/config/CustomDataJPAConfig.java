@@ -11,11 +11,9 @@ import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 import java.util.Properties;
 
-@EnableTransactionManagement
 @EnableJpaRepositories(basePackages = "org.matusikl.repository")
 @ComponentScan(basePackages = {"org.matusikl.service", "org.matusikl.mapperinterface"})
 @Configuration
@@ -39,7 +37,7 @@ public class CustomDataJPAConfig {
         dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
         dataSource.setUrl("jdbc:sqlserver://LucasPC\\SQLEXPRESS;databaseName=Management System");
         dataSource.setUsername("Administrator");
-        dataSource.setPassword("admin2");
+        dataSource.setPassword("admin3");
         return dataSource;
     }
 

@@ -1,6 +1,7 @@
 package org.matusikl.initConfig;
 
 import org.matusikl.config.CustomDataJPAConfig;
+import org.matusikl.config.CustomSecurityConfig;
 import org.matusikl.config.CustomWebMvcConfig;
 import org.matusikl.config.JSONConfig;
 import org.springframework.context.annotation.ComponentScan;
@@ -12,7 +13,7 @@ import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatche
 public class WebInitConfig extends AbstractAnnotationConfigDispatcherServletInitializer {
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return new Class<?>[] { CustomDataJPAConfig.class, JSONConfig.class};
+        return new Class<?>[] { CustomDataJPAConfig.class, JSONConfig.class, CustomSecurityConfig.class};
     }
 
     @Override

@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matusikl.dto.employeedto.EmployeeAccountDto;
 import org.matusikl.dto.employeedto.EmployeeGetDto;
 import org.matusikl.dto.employeedto.EmployeeJobDto;
@@ -13,8 +15,6 @@ import org.matusikl.dto.employeedto.EmployeePostDto;
 import org.matusikl.dto.employeedto.EmployeeRoleDto;
 import org.matusikl.dto.employeedto.EmployeeTaskDto;
 import org.matusikl.service.EmployeeService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +32,8 @@ import java.util.List;
 @RestController
 public class EmployeeController {
 
-    EmployeeService employeeService;
-    private Logger logger = LoggerFactory.getLogger(EmployeeController.class);
+    private final EmployeeService employeeService;
+    private final Logger logger = LogManager.getLogger(EmployeeController.class);
 
     @Autowired
     public EmployeeController(EmployeeService employeeService){
