@@ -1,6 +1,5 @@
 package org.matusikl.model;
 
-import org.matusikl.encryptionaes256.EncryptionPassword;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -34,10 +33,8 @@ public class Account implements Serializable {
         this.login = login;
     }
 
-    public String getPassword() throws Exception {
-        EncryptionPassword encryptionPassword = new EncryptionPassword();
-        String decryptedPassword = encryptionPassword.decrypt(password);
-        return decryptedPassword;
+    public String getPassword() {
+        return password;
     }
 
     public void setPassword(String password){

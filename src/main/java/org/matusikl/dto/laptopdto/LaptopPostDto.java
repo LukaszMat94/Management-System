@@ -1,6 +1,5 @@
 package org.matusikl.dto.laptopdto;
 
-import org.matusikl.encryptionaes256.EncryptionPassword;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -48,9 +47,7 @@ public class LaptopPostDto {
         return passwordLaptop;
     }
 
-    public void setPasswordLaptop(String passwordLaptop) throws Exception {
-        EncryptionPassword encryptionPassword = new EncryptionPassword();
-        String encryptedPassword = encryptionPassword.encrypt(passwordLaptop);
-        this.passwordLaptop = encryptedPassword;
+    public void setPasswordLaptop(String passwordLaptop) {
+        this.passwordLaptop = passwordLaptop;
     }
 }
