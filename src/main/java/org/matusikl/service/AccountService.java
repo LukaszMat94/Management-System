@@ -15,6 +15,7 @@ import org.matusikl.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -146,6 +147,6 @@ public class AccountService implements UserDetailsService{
                 .findRolesByAccountUsername(username);
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         roleList.forEach(role -> authorities.add(new SimpleGrantedAuthority(role)));
-        return new org.springframework.security.core.userdetails.User(account.getLogin(), account.getPassword(), authorities);
+        return new User(account.getLogin(), account.getPassword(), authorities);
     }
 }
