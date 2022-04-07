@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matusikl.dto.accountdto.AccountGetDto;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import javax.validation.Valid;
 
 @RestController
+@SecurityRequirement(name = "bearerAuth")
 public class AccountController {
 
     private final AccountService accountService;

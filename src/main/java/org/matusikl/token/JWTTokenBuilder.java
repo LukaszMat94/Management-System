@@ -15,43 +15,52 @@ public class JWTTokenBuilder {
     private String jwtRefreshToken;
     private static final Date expireAccessToken = new Date(System.currentTimeMillis() + 15 * 60 * 1000);
     private static final Date expireRefreshToken = new Date(System.currentTimeMillis() + 60 * 60 * 1000);
-    private static final String keySecret = "Luc@s!#M1103";
-    private static final Algorithm algorithm = Algorithm.HMAC256(keySecret.getBytes());
+    private static final String keySecretAccessToken = "Luc@s!#M1103";
+    private static final String keySecretRefreshToken = "Luc@s!#M1104";
+    private static final Algorithm algorithmAccessToken = Algorithm.HMAC256(keySecretAccessToken.getBytes());
+    private static final Algorithm algorithmRefreshToken = Algorithm.HMAC256(keySecretRefreshToken.getBytes());
 
-    private JWTTokenBuilder(String username, String issuer, String rolesName, List<?> claims){
+    private JWTTokenBuilder(String username, String rolesName, List<?> claims){
         jwtAccessToken= JWT.create()
                 .withSubject(username)
                 .withExpiresAt(expireAccessToken)
                 .withClaim(rolesName, claims)
-                .withIssuer(issuer)
-                .sign(algorithm);
+                .withIssuedAt(new Date(System.currentTimeMillis()))
+                .sign(algorithmAccessToken);
     }
 
-    private JWTTokenBuilder(String username, String issuer){
+    private JWTTokenBuilder(String username){
         jwtRefreshToken = JWT.create()
                 .withSubject(username)
                 .withExpiresAt(expireRefreshToken)
-                .withIssuer(issuer)
-                .sign(algorithm);
+                .withIssuedAt(new Date(System.currentTimeMillis()))
+                .sign(algorithmRefreshToken);
     }
 
-    public static String getAccessToken(String username, String issuer, String rolesName, List<?> claims){
-        JWTTokenBuilder accessToken = new JWTTokenBuilder(username, issuer, rolesName, claims);
+    public static String getAccessToken(String username, String rolesName, List<?> claims){
+        JWTTokenBuilder accessToken = new JWTTokenBuilder(username, rolesName, claims);
         return accessToken.jwtAccessToken;
     }
 
-    public static String getRefreshToken(String username, String issuer){
-        JWTTokenBuilder refreshToken = new JWTTokenBuilder(username, issuer);
+    public static String getRefreshToken(String username){
+        JWTTokenBuilder refreshToken = new JWTTokenBuilder(username);
         return refreshToken.jwtRefreshToken;
     }
 
-    public static Map<String, List<String>> getDecodedToken(String token){
-        JWTVerifier verifier = JWT.require(algorithm).build();
+    public static Map<String, List<String>> getDecodedAccessToken(String token){
+        JWTVerifier verifier = JWT.require(algorithmAccessToken).build();
         DecodedJWT decodedJWT = verifier.verify(token);
         String username = decodedJWT.getSubject();
         List<String> roles = decodedJWT.getClaim("roles").asList(String.class);
         Map<String, List<String>> usernameWithRoles = new HashMap<>();
         usernameWithRoles.put(username, roles);
         return usernameWithRoles;
+    }
+
+    public static String getDecodedRefreshToken(String token){
+        JWTVerifier verifier = JWT.require(algorithmRefreshToken).build();
+        DecodedJWT decodedJWT = verifier.verify(token);
+        String username = decodedJWT.getSubject();
+        return username;
     }
 }
