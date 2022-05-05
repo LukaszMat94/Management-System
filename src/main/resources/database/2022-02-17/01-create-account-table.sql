@@ -1,7 +1,7 @@
 --liquibase formatted sql
 --changeset lukasz_matusik:1_create_account_table
 
-USE [Management System]
+USE [${database.name}]
 GO
 
 SET ANSI_NULLS ON
@@ -10,7 +10,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE TABLE [dbo].[MS_Account](
+CREATE TABLE [${schema.name}].[MS_Account](
                                    [idAccount] [int] IDENTITY(1,1) NOT NULL,
                                    [login] [varchar](255) NOT NULL,
                                    [password] [varchar](255) NULL,
@@ -25,9 +25,9 @@ CREATE TABLE [dbo].[MS_Account](
 ) ON [PRIMARY]
 GO
 
-ALTER TABLE [dbo].[MS_Account]  WITH CHECK ADD  CONSTRAINT [login_constraint] CHECK  ((len([login])>=(8) AND NOT [login] like '%[^a-zA-Z0-9]%'))
+ALTER TABLE [${schema.name}].[MS_Account]  WITH CHECK ADD  CONSTRAINT [login_constraint] CHECK  ((len([login])>=(8) AND NOT [login] like '%[^a-zA-Z0-9]%'))
 GO
 
-ALTER TABLE [dbo].[MS_Account] CHECK CONSTRAINT [login_constraint]
+ALTER TABLE [${schema.name}].[MS_Account] CHECK CONSTRAINT [login_constraint]
 GO
 

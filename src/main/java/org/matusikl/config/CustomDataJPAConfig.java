@@ -1,8 +1,11 @@
 package org.matusikl.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -16,8 +19,23 @@ import java.util.Properties;
 
 @EnableJpaRepositories(basePackages = "org.matusikl.repository")
 @ComponentScan(basePackages = {"org.matusikl.service", "org.matusikl.mapperinterface"})
+@PropertySource(value= {"classpath:application.properties"})
 @Configuration
 public class CustomDataJPAConfig {
+
+    @Value("${spring.datasource.username}")
+    private String username;
+
+    @Value("${spring.datasource.password}")
+    private String password;
+
+    @Value("${property.databaseName}")
+    private String databaseName;
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
@@ -35,9 +53,9 @@ public class CustomDataJPAConfig {
     public DataSource dataSource(){
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        dataSource.setUrl("jdbc:sqlserver://LucasPC\\SQLEXPRESS;databaseName=Management System");
-        dataSource.setUsername("Administrator");
-        dataSource.setPassword("admin3");
+        dataSource.setUrl(String.format("jdbc:sqlserver://LucasPC\\SQLEXPRESS;databaseName=%s", databaseName));
+        dataSource.setUsername(username);
+        dataSource.setPassword(password);
         return dataSource;
     }
 
