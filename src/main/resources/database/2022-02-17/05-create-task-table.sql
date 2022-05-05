@@ -1,7 +1,7 @@
 --liquibase formatted sql
 --changeset lukasz_matusik:5_create_task_table
 
-USE [Management System]
+USE [${database.name}]
 GO
 
 SET ANSI_NULLS ON
@@ -10,7 +10,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE TABLE [dbo].[MS_Task](
+CREATE TABLE [${schema.name}].[MS_Task](
                                 [idTask] [int] IDENTITY(1,1) NOT NULL,
                                 [name] [varchar](255) NULL,
                                 [description] [varchar](255) NULL,

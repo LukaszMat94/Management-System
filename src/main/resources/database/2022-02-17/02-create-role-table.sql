@@ -1,7 +1,7 @@
 --liquibase formatted sql
 --changeset lukasz_matusik:2_create_role_table
 
-USE [Management System]
+USE [${database.name}]
 GO
 
 SET ANSI_NULLS ON
@@ -10,7 +10,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE TABLE [dbo].[MS_Role](
+CREATE TABLE [${schema.name}].[MS_Role](
                                 [id] [int] IDENTITY(1,1) NOT NULL,
                                 [role] [varchar](255) NOT NULL,
                                 PRIMARY KEY CLUSTERED
@@ -24,10 +24,10 @@ CREATE TABLE [dbo].[MS_Role](
 ) ON [PRIMARY]
 GO
 
-ALTER TABLE [dbo].[MS_Role]  WITH CHECK ADD  CONSTRAINT [role_constraint] CHECK  (([role] like 'ROLE[_]%'))
+ALTER TABLE [${schema.name}].[MS_Role]  WITH CHECK ADD  CONSTRAINT [role_constraint] CHECK  (([role] like 'ROLE[_]%'))
 GO
 
-ALTER TABLE [dbo].[MS_Role] CHECK CONSTRAINT [role_constraint]
+ALTER TABLE [${schema.name}].[MS_Role] CHECK CONSTRAINT [role_constraint]
 GO
 
 

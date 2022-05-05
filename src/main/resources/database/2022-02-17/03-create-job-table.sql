@@ -1,7 +1,7 @@
 --liquibase formatted sql
 --changeset lukasz_matusik:3_create_job_table
 
-USE [Management System]
+USE [${database.name}]
 GO
 
 SET ANSI_NULLS ON
@@ -10,7 +10,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE TABLE [dbo].[MS_Job](
+CREATE TABLE [${schema.name}].[MS_Job](
                                [id] [int] IDENTITY(1,1) NOT NULL,
                                [job] [varchar](255) NULL,
                                PRIMARY KEY CLUSTERED
